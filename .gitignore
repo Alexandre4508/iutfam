@@ -1,0 +1,26 @@
+
+# Node / monorepo
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+.out/
+coverage/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Docker
+docker-data/
+*.pid
+
+# OS
+.DS_Store
+Thumbs.db

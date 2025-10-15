@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: iutfam-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: iutfam
+      POSTGRES_PASSWORD: "ChangezMoi!2025"
+      POSTGRES_DB: iutfam
+    ports:
+#      - "5432:5432"
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+
+  api:
+    image: node:20
+    container_name: iutfam-api
+    working_dir: /app
+    ports:
+      - "4000:4000"
+    environment:
+      PORT: 4000
+      DATABASE_URL: "postgresql://iutfam:ChangezMoi!2025@postgres:5432/iutfam?schema=public"
+      JWT_ACCESS_TTL: "15m"
+      JWT_REFRESH_TTL: "30d"
+      JWT_SECRET: "changez-moi-tres-long-aleatoire"
+      UPLOAD_DIR: "/var/iutfam/uploads"
+      ALLOWED_EMAIL_DOMAINS: "-iut.re,.univ-reunion.fr"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./iutfam-api:/app
+      - ./data/uploads:/var/iutfam/uploads
+      - ./docker/api-entrypoint.sh:/entrypoint.sh
+    depends_on:
+      - postgres
+    command: ["bash", "/entrypoint.sh"]
+
+  web:
+    image: node:20
+    container_name: iutfam-web
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:4000"
+      NEXT_PUBLIC_WS_URL: "ws://localhost:4000/ws"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./iutfam-web:/app
+      - ./docker/web-entrypoint.sh:/entrypoint.sh
+    depends_on:
+      - api
+    command: ["bash", "/entrypoint.sh"]

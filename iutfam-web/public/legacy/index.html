@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IUTFAM - Plateforme Étudiante IUT Réunion</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Page d'accueil -->
+    <div id="landing-page" class="page active">
+        <header class="landing-header">
+            <div class="container">
+                <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/3d7c6c29-ee4d-4964-81b0-f4659319b685.png" alt="IUTFAM Logo" class="logo-main">
+                <h1>Bienvenue sur IUTFAM</h1>
+                <p class="welcome-text">La plateforme qui connecte tous les étudiants de l'IUT de la Réunion ! 🌺</p>
+                
+                <div class="welcome-features">
+                    <div class="feature-card">
+                        <h3>🗣️ Chat & Communauté</h3>
+                        <p>Échange avec tes camarades dans le chat général ou en privé</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎉 Événements</h3>
+                        <p>Organise et participe aux sorties étudiantes</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🗺️ Carte Interactive</h3>
+                        <p>Navigue facilement sur le campus</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🚗 Covoiturage</h3>
+                        <p>Partage tes trajets avec d'autres étudiants</p>
+                    </div>
+                </div>
+
+                <div class="auth-buttons">
+                    <button type="button" class="btn btn--primary btn--lg" onclick="showLoginPage()">Se Connecter</button>
+                    <button type="button" class="btn btn--secondary btn--lg" onclick="showRegisterPage()">S'inscrire</button>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="button" class="btn btn--outline" onclick="demoLogin()">🎯 Connexion démo (Marie)</button>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <!-- Page d'inscription -->
+    <div id="register-page" class="page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/3d7c6c29-ee4d-4964-81b0-f4659319b685.png" alt="IUTFAM Logo" class="logo-auth">
+                <h2>Créer un compte IUTFAM</h2>
+                <form id="register-form" onsubmit="return register(event)">
+                    <div class="form-group">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email universitaire</label>
+                        <input type="email" class="form-control" id="email" placeholder="nom@iut.re ou nom@univ-reunion.fr" required>
+                        <small class="form-text">Seuls les emails universitaires sont acceptés</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Département</label>
+                        <select class="form-control" id="department" required>
+                            <option value="">Choisir un département</option>
+                            <option value="GEA">Gestion des Entreprises et des Administrations (GEA)</option>
+                            <option value="GCCD">Génie Civil Construction Durable (GCCD)</option>
+                            <option value="GB">Génie Biologique (GB)</option>
+                            <option value="RT">Réseaux et Télécommunications (RT)</option>
+                            <option value="CS">Carrières Sociales (CS)</option>
+                            <option value="HSE">Hygiène Sécurité Environnement (HSE)</option>
+                            <option value="TC">Techniques de Commercialisation (TC)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Année d'étude</label>
+                        <select class="form-control" id="year" required>
+                            <option value="">Choisir l'année</option>
+                            <option value="1ère année">1ère année</option>
+                            <option value="2ème année">2ème année</option>
+                            <option value="3ème année">3ème année</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">S'inscrire</button>
+                </form>
+                <p class="auth-link">
+                  Déjà inscrit ?
+                  <!-- remplacé par data-action -->
+                  <a href="#" data-action="go-login">Se connecter</a>
+                </p>
+                <button type="button" class="btn btn--outline" onclick="showLandingPage()">← Retour à l'accueil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page de connexion -->
+    <div id="login-page" class="page">
+      <div class="auth-container">
+        <div class="auth-card">
+          <img src="/legacy/logo-iutfam.jpeg" alt="IUTFAM" style="max-width:160px; height:auto;" />
+          <h2>Se connecter à IUTFAM</h2>
+
+          <form id="login-form" onsubmit="return login(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email</label>
+              <input type="email" class="form-control" id="login-email" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Mot de passe</label>
+              <input type="password" class="form-control" id="login-password" required />
+            </div>
+
+            <button type="submit" class="btn btn--primary btn--full-width">Se connecter</button>
+          </form>
+
+          <div class="demo-credentials">
+              <h4>Comptes de démonstration :</h4>
+              <div class="demo-account">
+                  <p><strong>Email:</strong> marie.dubois@iut.re</p>
+                  <p><strong>Mot de passe:</strong> password123</p>
+                  <button type="button" class="btn btn--sm btn--outline" onclick="fillDemoCredentials('marie')">Remplir automatiquement</button>
+              </div>
+          </div>
+
+          <p class="auth-link">
+            Pas encore inscrit ?
+            <!-- remplacé par data-action -->
+            <a href="#" data-action="go-register">S'inscrire</a>
+          </p>
+          <button type="button" class="btn btn--outline" onclick="showLandingPage()">← Retour à l'accueil</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Application principale -->
+    <div id="main-app" class="app">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/3d7c6c29-ee4d-4964-81b0-f4659319b685.png" alt="IUTFAM" class="logo-nav">
+                <span>IUTFAM</span>
+            </div>
+            <div class="nav-menu">
+                <button type="button" class="nav-link active" data-section="dashboard">🏠 Accueil</button>
+                <button type="button" class="nav-link" data-section="chat">💬 Chat</button>
+                <button type="button" class="nav-link" data-section="friends">👥 Amis</button>
+                <button type="button" class="nav-link" data-section="groups">🏫 Groupes</button>
+                <button type="button" class="nav-link" data-section="events">🎉 Événements</button>
+                <button type="button" class="nav-link" data-section="map">🗺️ Carte</button>
+                <button type="button" class="nav-link" data-section="board">📋 Board</button>
+                <button type="button" class="nav-link" data-section="canteen">🍽️ Cantine</button>
+                <button type="button" class="nav-link" data-section="lostfound">🔍 Lost & Found</button>
+                <button type="button" class="nav-link" data-section="transport">🚗 Transport</button>
+            </div>
+            <div class="nav-user">
+                <div class="user-info">
+                    <span id="currentUserName">Utilisateur</span>
+                    <button type="button" class="btn btn--sm" onclick="showProfilePage()">⚙️ Profil</button>
+                    <button type="button" class="btn btn--sm btn--outline" onclick="logout()">Déconnexion</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenu principal -->
+        <main class="main-content">
+            <!-- Dashboard -->
+            <section id="dashboard" class="section active">
+                <div class="container">
+                    <h1>Tableau de bord</h1>
+                    <p class="welcome-message">Bienvenue sur IUTFAM, <span id="dashboardUserName">Utilisateur</span>! 🌺</p>
+                    
+                    <div class="dashboard-grid">
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>💬 Derniers messages</h3>
+                                <div id="recentMessages" class="recent-messages">
+                                    <div class="message-preview">
+                                        <strong>Marie (GEA):</strong> Quelqu'un pour la cantine ce midi ?
+                                    </div>
+                                    <div class="message-preview">
+                                        <strong>Thomas (RT):</strong> Super soirée hier ! 🎉
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn--primary btn--sm" onclick="showSection('chat')">Voir le chat</button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>🎉 Prochains événements</h3>
+                                <div class="upcoming-events">
+                                    <div class="event-preview">
+                                        <strong>Repas cantine ensemble</strong><br>
+                                        <small>15 septembre - Cantine IUT</small>
+                                    </div>
+                                    <div class="event-preview">
+                                        <strong>Soirée étudiante au port</strong><br>
+                                        <small>20 septembre - Port de Saint-Pierre</small>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn--primary btn--sm" onclick="showSection('events')">Voir tous les événements</button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>🍽️ Menu du jour</h3>
+                                <div class="menu-preview">
+                                    <strong>Aujourd'hui :</strong><br>
+                                    Cari poulet, riz, rougail tomate, fruits de saison
+                                </div>
+                                <button type="button" class="btn btn--primary btn--sm" onclick="showSection('canteen')">Voir le menu complet</button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>👥 Activité</h3>
+                                <div class="activity-stats">
+                                    <p><strong>127</strong> étudiants connectés</p>
+                                    <p><strong>5</strong> nouveaux événements</p>
+                                    <p><strong>12</strong> messages dans votre département</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat général -->
+            <section id="chat" class="section">
+                <div class="container">
+                    <h1>💬 Chat général</h1>
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message">
+                                <div class="message-author">Marie (GEA) - 10:45</div>
+                                <div class="message-content">Salut tout le monde ! Quelqu'un pour la cantine ce midi ?</div>
+                            </div>
+                            <div class="message">
+                                <div class="message-author">Thomas (RT) - 10:47</div>
+                                <div class="message-content">Oui je suis partant ! On se retrouve à 12h ?</div>
+                            </div>
+                            <div class="message">
+                                <div class="message-author">Sarah (GB) - 10:50</div>
+                                <div class="message-content">Super idée ! Moi aussi je viens 😊</div>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="messageInput" placeholder="Tapez votre message..." class="form-control">
+                            <button type="button" onclick="sendMessage()" class="btn btn--primary">Envoyer</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Amis -->
+            <section id="friends" class="section">
+                <div class="container">
+                    <h1>👥 Mes amis</h1>
+                    <div class="friends-content">
+                        <div class="friends-search">
+                            <input type="text" placeholder="Rechercher un étudiant..." class="form-control">
+                            <button type="button" class="btn btn--primary">Rechercher</button>
+                        </div>
+                        
+                        <div class="friends-tabs">
+                            <button type="button" class="btn btn--secondary active" data-tab="friends">Mes amis (3)</button>
+                            <button type="button" class="btn btn--secondary" data-tab="requests">Demandes (2)</button>
+                            <button type="button" class="btn btn--secondary" data-tab="search">Recherche</button>
+                        </div>
+
+                        <div id="friends-list" class="friends-list">
+                            <div class="friend-card">
+                                <div class="friend-info">
+                                    <strong>Marie Dubois</strong>
+                                    <span>GEA - 2ème année</span>
+                                </div>
+                                <button type="button" class="btn btn--primary btn--sm" onclick="openPrivateChat('Marie')">💬 Message</button>
+                            </div>
+                            <div class="friend-card">
+                                <div class="friend-info">
+                                    <strong>Thomas Martin</strong>
+                                    <span>RT - 1ère année</span>
+                                </div>
+                                <button type="button" class="btn btn--primary btn--sm" onclick="openPrivateChat('Thomas')">💬 Message</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Groupes de classe -->
+            <section id="groups" class="section">
+                <div class="container">
+                    <h1>🏫 Groupes de classe</h1>
+                    <div class="groups-content">
+                        <div class="group-card">
+                            <div class="group-header">
+                                <h3>Mon département - <span id="userDepartment">GEA</span></h3>
+                                <div class="group-members">24 membres</div>
+                            </div>
+                            <div class="group-actions">
+                                <button type="button" class="btn btn--primary" onclick="openGroupChat()">💬 Chat du groupe</button>
+                                <button type="button" class="btn btn--outline" onclick="leaveGroup()">Quitter le groupe</button>
+                            </div>
+                        </div>
+
+                        <div class="other-groups">
+                            <h3>Autres groupes disponibles</h3>
+                            <div class="group-list">
+                                <div class="group-item">
+                                    <span>RT - Réseaux et Télécommunications</span>
+                                    <button type="button" class="btn btn--sm btn--primary">Rejoindre</button>
+                                </div>
+                                <div class="group-item">
+                                    <span>GB - Génie Biologique</span>
+                                    <button type="button" class="btn btn--sm btn--primary">Rejoindre</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Événements -->
+            <section id="events" class="section">
+                <div class="container">
+                    <h1>🎉 Événements</h1>
+                    <div class="events-header">
+                        <button type="button" class="btn btn--primary" onclick="showCreateEvent()">+ Créer un événement</button>
+                    </div>
+                    
+                    <div class="events-grid">
+                        <div class="event-card">
+                            <div class="event-header">
+                                <h3>Repas cantine ensemble</h3>
+                                <span class="event-date">15 septembre 2025</span>
+                            </div>
+                            <div class="event-details">
+                                <p>📍 Cantine IUT</p>
+                                <p>👥 5 participants</p>
+                                <p>Organisé par Marie (GEA)</p>
+                            </div>
+                            <div class="event-actions">
+                                <button type="button" class="btn btn--primary btn--sm">✅ Participer</button>
+                                <button type="button" class="btn btn--outline btn--sm">ℹ️ Détails</button>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-header">
+                                <h3>Soirée étudiante au port</h3>
+                                <span class="event-date">20 septembre 2025</span>
+                            </div>
+                            <div class="event-details">
+                                <p>📍 Port de Saint-Pierre</p>
+                                <p>👥 12 participants</p>
+                                <p>Organisé par Thomas (RT)</p>
+                            </div>
+                            <div class="event-actions">
+                                <button type="button" class="btn btn--primary btn--sm">✅ Participer</button>
+                                <button type="button" class="btn btn--outline btn--sm">ℹ️ Détails</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Carte -->
+            <section id="map" class="section">
+                <div class="container">
+                    <h1>🗺️ Carte du campus</h1>
+                    <div class="map-container">
+                        <div class="map-placeholder">
+                            <h3>Carte Interactive de l'IUT</h3>
+                            <p>40 avenue de Soweto, Saint-Pierre, Réunion</p>
+                            <div class="map-points">
+                                <div class="map-point">📍 Bâtiment Administration</div>
+                                <div class="map-point">📍 Amphithéâtre</div>
+                                <div class="map-point">📍 Cantine</div>
+                                <div class="map-point">📍 Bibliothèque</div>
+                                <div class="map-point">📍 Parking étudiant</div>
+                                <div class="map-point">📍 Laboratoires</div>
+                            </div>
+                            <button type="button" class="btn btn--primary">🧭 Me localiser</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Board / Forum -->
+            <section id="board" class="section">
+                <div class="container">
+                    <h1>📋 Board - Partage d'informations</h1>
+                    <div class="board-header">
+                        <button type="button" class="btn btn--primary" onclick="showCreatePost()">+ Nouveau post</button>
+                    </div>
+                    
+                    <div class="board-categories">
+                        <button type="button" class="btn btn--secondary active">Tout</button>
+                        <button type="button" class="btn btn--secondary">📚 Études</button>
+                        <button type="button" class="btn btn--secondary">🏠 Logement</button>
+                        <button type="button" class="btn btn--secondary">💼 Emploi</button>
+                        <button type="button" class="btn btn--secondary">📝 Divers</button>
+                    </div>
+
+                    <div class="posts-list">
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-author">Sarah (GB) - 2h</div>
+                                <div class="post-category">📚 Études</div>
+                            </div>
+                            <h3>Recherche partenaire pour projet environnement</h3>
+                            <p>Salut ! Je cherche quelqu'un pour m'accompagner sur un projet d'analyse des eaux. Contact moi si intéressé !</p>
+                            <div class="post-actions">
+                                <button type="button" class="btn btn--outline btn--sm">👍 5 likes</button>
+                                <button type="button" class="btn btn--outline btn--sm">💬 2 commentaires</button>
+                            </div>
+                        </div>
+
+                        <div class="post-card">
+                            <div class="post-header">
+                                <div class="post-author">Lucas (GCCD) - 5h</div>
+                                <div class="post-category">🏠 Logement</div>
+                            </div>
+                            <h3>Colocation disponible près du campus</h3>
+                            <p>Une chambre libre dans ma coloc à 5min de l'IUT. 350€/mois charges comprises. DM moi pour plus d'infos !</p>
+                            <div class="post-actions">
+                                <button type="button" class="btn btn--outline btn--sm">👍 8 likes</button>
+                                <button type="button" class="btn btn--outline btn--sm">💬 6 commentaires</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Menu Cantine -->
+            <section id="canteen" class="section">
+                <div class="container">
+                    <h1>🍽️ Menu de la cantine</h1>
+                    <div class="canteen-header">
+                        <button type="button" class="btn btn--primary">📸 Poster le menu du jour</button>
+                    </div>
+                    
+                    <div class="menu-today">
+                        <div class="card">
+                            <div class="card__body">
+                                <h3>Menu d'aujourd'hui - 12 septembre</h3>
+                                <div class="menu-content">
+                                    <p><strong>Plat principal :</strong> Cari poulet</p>
+                                    <p><strong>Accompagnement :</strong> Riz blanc</p>
+                                    <p><strong>Légumes :</strong> Rougail tomate</p>
+                                    <p><strong>Dessert :</strong> Fruits de saison</p>
+                                </div>
+                                <div class="menu-info">
+                                    <p>💰 Prix : 3.50€ étudiants</p>
+                                    <p>🕐 Horaires : 11h30 - 14h00</p>
+                                </div>
+                                <div class="menu-actions">
+                                    <button type="button" class="btn btn--outline btn--sm">⭐ Noter ce menu</button>
+                                    <button type="button" class="btn btn--outline btn--sm">💬 Commentaire</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-history">
+                        <h3>Menus précédents</h3>
+                        <div class="menu-card">
+                            <div class="menu-date">11 septembre</div>
+                            <div class="menu-summary">Gratin de courgettes, salade verte, yaourt</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lost & Found -->
+            <section id="lostfound" class="section">
+                <div class="container">
+                    <h1>🔍 Lost & Found</h1>
+                    <div class="lostfound-header">
+                        <button type="button" class="btn btn--primary">+ Déclarer un objet trouvé</button>
+                        <button type="button" class="btn btn--secondary">+ Déclarer une perte</button>
+                    </div>
+                    
+                    <div class="lostfound-tabs">
+                        <button type="button" class="btn btn--secondary active">🔍 Objets trouvés</button>
+                        <button type="button" class="btn btn--secondary">❓ Objets perdus</button>
+                    </div>
+
+                    <div class="lostfound-items">
+                        <div class="item-card">
+                            <div class="item-info">
+                                <h3>Clés avec porte-clé Mickey</h3>
+                                <p>📍 Trouvé près de la bibliothèque</p>
+                                <p>📅 10 septembre</p>
+                                <p>👤 Trouvé par Marie (GEA)</p>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" class="btn btn--primary btn--sm">📞 Contacter</button>
+                            </div>
+                        </div>
+
+                        <div class="item-card">
+                            <div class="item-info">
+                                <h3>Sweat à capuche bleu</h3>
+                                <p>📍 Trouvé en salle RT-05</p>
+                                <p>📅 9 septembre</p>
+                                <p>👤 Trouvé par Thomas (RT)</p>
+                            </div>
+                            <div class="item-actions">
+                                <button type="button" class="btn btn--primary btn--sm">📞 Contacter</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Transport / Covoiturage -->
+            <section id="transport" class="section">
+                <div class="container">
+                    <h1>🚗 Transport & Covoiturage</h1>
+                    <div class="transport-header">
+                        <button type="button" class="btn btn--primary">+ Proposer un covoiturage</button>
+                        <button type="button" class="btn btn--secondary">+ Chercher un trajet</button>
+                    </div>
+                    
+                    <div class="transport-tabs">
+                        <button type="button" class="btn btn--secondary active">🚗 Covoiturages</button>
+                        <button type="button" class="btn btn--secondary">🚌 Transports en commun</button>
+                    </div>
+
+                    <div class="carpooling-offers">
+                        <div class="carpooling-card">
+                            <div class="carpooling-route">
+                                <h3>Saint-Denis → IUT Saint-Pierre</h3>
+                                <p>📅 Lundi 15 septembre - 7h30</p>
+                            </div>
+                            <div class="carpooling-details">
+                                <p>👤 Proposé par Lucas (GCCD)</p>
+                                <p>💺 2 places disponibles</p>
+                                <p>💰 5€ par personne</p>
+                            </div>
+                            <div class="carpooling-actions">
+                                <button type="button" class="btn btn--primary btn--sm">📞 Contacter</button>
+                                <button type="button" class="btn btn--outline btn--sm">⭐ Réserver</button>
+                            </div>
+                        </div>
+
+                        <div class="carpooling-card">
+                            <div class="carpooling-route">
+                                <h3>Le Tampon → IUT Saint-Pierre</h3>
+                                <p>📅 Mardi 16 septembre - 8h00</p>
+                            </div>
+                            <div class="carpooling-details">
+                                <p>👤 Proposé par Sarah (GB)</p>
+                                <p>💺 1 place disponible</p>
+                                <p>💰 3€ par personne</p>
+                            </div>
+                            <div class="carpooling-actions">
+                                <button type="button" class="btn btn--primary btn--sm">📞 Contacter</button>
+                                <button type="button" class="btn btn--outline btn--sm">⭐ Réserver</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Page profil -->
+    <div id="profile-page" class="page">
+        <div class="container">
+            <div class="profile-container">
+                <div class="profile-header">
+                    <h1>⚙️ Mon profil</h1>
+                    <button type="button" class="btn btn--outline" onclick="backToApp()">← Retour</button>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-form">
+                        <div class="form-group">
+                            <label class="form-label">Photo de profil</label>
+                            <div class="profile-photo">
+                                <div class="photo-placeholder">📸</div>
+                                <button type="button" class="btn btn--secondary btn--sm">Changer</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" class="form-control" id="profileFirstName">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="profileLastName">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="profileEmail" readonly>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Département</label>
+                            <select class="form-control" id="profileDepartment">
+                                <option value="GEA">Gestion des Entreprises et des Administrations (GEA)</option>
+                                <option value="GCCD">Génie Civil Construction Durable (GCCD)</option>
+                                <option value="GB">Génie Biologique (GB)</option>
+                                <option value="RT">Réseaux et Télécommunications (RT)</option>
+                                <option value="CS">Carrières Sociales (CS)</option>
+                                <option value="HSE">Hygiène Sécurité Environnement (HSE)</option>
+                                <option value="TC">Techniques de Commercialisation (TC)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Année d'étude</label>
+                            <select class="form-control" id="profileYear">
+                                <option value="1ère année">1ère année</option>
+                                <option value="2ème année">2ème année</option>
+                                <option value="3ème année">3ème année</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Centres d'intérêt</label>
+                            <textarea class="form-control" id="profileInterests" placeholder="Sport, musique, voyages..."></textarea>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button type="button" class="btn btn--primary" onclick="saveProfile()">Sauvegarder</button>
+                            <button type="button" class="btn btn--outline" onclick="backToApp()">Annuler</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="privateChat" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Chat privé avec <span id="privateChatUser"></span></h3>
+                <button type="button" class="modal-close" onclick="closePrivateChat()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="chat-messages" id="privateChatMessages">
+                    <div class="message">
+                        <div class="message-author">Vous - 09:45</div>
+                        <div class="message-content">Salut ! Comment ça va ?</div>
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="privateMessageInput" placeholder="Tapez votre message..." class="form-control">
+                    <button type="button" onclick="sendPrivateMessage()" class="btn btn--primary">Envoyer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/legacy/app.js"></script>
+</body>
+</html>

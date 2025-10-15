@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String            @id @default(cuid())
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  email        String            @unique
+  username     String            @unique
+  passwordHash String
+  displayName  String?
+  avatarUrl    String?
+  department   String?
+  BoardPost    BoardPost[]
+  canteenPosts CanteenPost[]
+  chats        ChatParticipant[]
+  events       Event[]           @relation("Creator")
+  invites      EventInvite[]
+  friendsB     FriendRequest[]   @relation("B")
+  friendsA     FriendRequest[]   @relation("A")
+  lostFound    LostFoundItem[]
+  messages     Message[]
+  rideShares   RideShare[]
+  classes      UserClass[]
+}
+
+model ClassGroup {
+  id    String      @id @default(cuid())
+  name  String      @unique
+  chats Chat[]
+  users UserClass[]
+}
+
+model UserClass {
+  id           String     @id @default(cuid())
+  userId       String
+  classGroupId String
+  classGroup   ClassGroup @relation(fields: [classGroupId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@unique([userId, classGroupId])
+}
+
+model FriendRequest {
+  id          String       @id @default(cuid())
+  requesterId String
+  addresseeId String
+  status      FriendStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  addressee   User         @relation("B", fields: [addresseeId], references: [id])
+  requester   User         @relation("A", fields: [requesterId], references: [id])
+
+  @@unique([requesterId, addresseeId])
+}
+
+model Chat {
+  id           String            @id @default(cuid())
+  type         ChatType
+  classId      String?
+  class        ClassGroup?       @relation(fields: [classId], references: [id])
+  participants ChatParticipant[]
+  messages     Message[]
+}
+
+model ChatParticipant {
+  id     String @id @default(cuid())
+  chatId String
+  userId String
+  chat   Chat   @relation(fields: [chatId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([chatId, userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  chatId    String
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+  chat      Chat     @relation(fields: [chatId], references: [id])
+  sender    User     @relation(fields: [senderId], references: [id])
+}
+
+model Event {
+  id          String        @id @default(cuid())
+  creatorId   String
+  title       String
+  description String?
+  date        DateTime
+  location    String?
+  lat         Float?
+  lng         Float?
+  scope       EventScope
+  creator     User          @relation("Creator", fields: [creatorId], references: [id])
+  invites     EventInvite[]
+}
+
+model EventInvite {
+  id        String     @id @default(cuid())
+  eventId   String
+  userId    String
+  status    RSVPStatus @default(PENDING)
+  invitedBy String?
+  event     Event      @relation(fields: [eventId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model BoardPost {
+  id        String   @id @default(cuid())
+  authorId  String
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+}
+
+model CanteenPost {
+  id        String   @id @default(cuid())
+  authorId  String
+  caption   String?
+  photoPath String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+}
+
+model LostFoundItem {
+  id          String   @id @default(cuid())
+  posterId    String
+  title       String
+  description String
+  photoPath   String?
+  foundLat    Float?
+  foundLng    Float?
+  createdAt   DateTime @default(now())
+  poster      User     @relation(fields: [posterId], references: [id])
+}
+
+model RideShare {
+  id        String   @id @default(cuid())
+  posterId  String
+  from      String
+  to        String
+  departAt  DateTime
+  seats     Int
+  note      String?
+  createdAt DateTime @default(now())
+  poster    User     @relation(fields: [posterId], references: [id])
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum ChatType {
+  GENERAL
+  PRIVATE
+  CLASS
+}
+
+enum EventScope {
+  ALL
+  DEPARTMENT
+  FRIENDS
+  CUSTOM
+}
+
+enum RSVPStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}

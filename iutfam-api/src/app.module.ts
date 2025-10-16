@@ -1,17 +1,16 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
+﻿import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';         // <-- AJOUT
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // charge le .env automatiquement
-    PrismaModule, // gère la connexion à PostgreSQL
-    AuthModule,   // ton module d’authentification
+    ConfigModule.forRoot({ isGlobal: true }),          // <-- AJOUT (global)
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+

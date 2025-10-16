@@ -87,7 +87,7 @@ async function register(event) {
   // Préparation des données pour le backend
   const username    = (firstName + '.' + lastName).toLowerCase().replace(/\s+/g, '');
   const displayName = `${firstName} ${lastName}`;
-  const className   = `${department} - ${year}`;
+  const className   = `${department}-${year}`; // ✅ sans espaces autour du tiret
 
   try {
     const res = await fetch(`${API}/auth/register`, {
@@ -269,4 +269,8 @@ function logout() {
 // ============================================
 document.addEventListener("DOMContentLoaded", () => {
   showLoginPage();
+
+  // ✅ branche les formulaires
+  document.getElementById('register-form')?.addEventListener('submit', e => register(e));
+  document.getElementById('login-form')?.addEventListener('submit', e => login(e));
 });

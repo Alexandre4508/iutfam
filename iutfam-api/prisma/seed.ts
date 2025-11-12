@@ -2,31 +2,26 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Chat GENERAL singleton
+  // ⚠️ Mets ici une valeur VALIDE de ton enum ChatType (ex: 'GROUP', 'DIRECT', 'CLASS', …)
+  const chatType: any = 'GROUP';
+
   await prisma.chat.upsert({
-    where: { id: 'GENERAL_SINGLETON' },
-    create: { id: 'GENERAL_SINGLETON', type: 'GENERAL' },
+    where: { id: 'general' },
     update: {},
+    create: { id: 'general', type: chatType },
   });
 
-  // Groupes de classes
-  await prisma.classGroup.createMany({
-    data: [
-      { name: 'BUT RT1-A' },
-      { name: 'BUT RT2-A' },
-      { name: 'BUT RT2-B' },
-    ],
-    skipDuplicates: true,
+  await prisma.user.upsert({
+    where: { id: 'u_dev' },
+    update: {},
+    create: {
+      id: 'u_dev',
+      email: 'dev@iutfam.local',
+      username: 'devuser',
+      passwordHash: 'dev-hash',      // valeur factice suffisante pour la seed
+      displayName: 'Careena (dev)',  // optionnel
+    },
   });
 }
 
-main()
-  .then(async () => {
-    console.log('✅ Base de données initialisée avec succès !');
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error('❌ Erreur lors du seed :', e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+main().finally(() => prisma.$disconnect());

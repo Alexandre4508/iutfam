@@ -33,7 +33,7 @@ export class AuthController {
     const refreshToken = await this.jwt.signAsync(payload, { expiresIn: refreshTtl });
 
     // 4) poser les cookies httpOnly (dev: secure=false)
-    res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'lax', path: '/' });
+    res.cookie('access_token', accessToken, { httpOnly: true, sameSite: 'lax', secure: false, path: '/', maxAge: 7 * 24 * 3600 * 1000, });
     res.cookie('refresh_token', refreshToken, { httpOnly: true, sameSite: 'lax', path: '/' });
 
     // 5) réponse légère pour le front

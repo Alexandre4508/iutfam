@@ -240,31 +240,25 @@
             </section>
 
             <!-- Chat général -->
-            <section id="chat" class="section">
-                <div class="container">
-                    <h1>💬 Chat général</h1>
-                    <div class="chat-container">
-                        <div class="chat-messages" id="chatMessages">
-                            <div class="message">
-                                <div class="message-author">Marie (GEA) - 10:45</div>
-                                <div class="message-content">Salut tout le monde ! Quelqu'un pour la cantine ce midi ?</div>
-                            </div>
-                            <div class="message">
-                                <div class="message-author">Thomas (RT) - 10:47</div>
-                                <div class="message-content">Oui je suis partant ! On se retrouve à 12h ?</div>
-                            </div>
-                            <div class="message">
-                                <div class="message-author">Sarah (GB) - 10:50</div>
-                                <div class="message-content">Super idée ! Moi aussi je viens 😊</div>
-                            </div>
-                        </div>
-                        <div class="chat-input">
-                            <input type="text" id="messageInput" placeholder="Tapez votre message..." class="form-control">
-                            <button type="button" onclick="sendMessage()" class="btn btn--primary">Envoyer</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+<section id="chat" class="section">
+  <div class="container">
+    <h1>💬 Chat général</h1>
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <!-- (tes messages d’exemple peuvent rester ou être vides) -->
+      </div>
+
+      <!-- petit indicateur de frappe -->
+      <div id="typingIndicator" class="message" style="display:none; opacity:.7"></div>
+
+      <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Tapez votre message..." class="form-control">
+        <button type="button" onclick="sendMessage()" class="btn btn--primary">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</section>
+
 
             <!-- Amis -->
             <section id="friends" class="section">
@@ -675,5 +669,101 @@
     </div>
 
     <script src="/legacy/app.js"></script>
+    <!-- Client Socket.IO -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+<script>
+  // ====== Config locale ======
+  const API_URL = "http://localhost:4000";
+  const CHAT_ID = "GENERAL_SINGLETON"; // tu peux passer à 'general' si tu as créé ce chat
+  const USER_ID = "u_dev";             // à remplacer plus tard par l'ID du user connecté
+
+  // ====== Références DOM ======
+  const chatEl   = document.getElementById("chatMessages");
+  const inputEl  = document.getElementById("messageInput");
+  const typingEl = document.getElementById("typingIndicator");
+
+  // ====== Connexion Socket.IO ======
+  const socket = io(API_URL, { withCredentials: true, transports: ["websocket"] });
+
+  socket.on("connect", () => {
+    console.log("Socket.IO connecté", socket.id);
+    socket.emit("chat:join", { chatId: CHAT_ID, limit: 50 });
+  });
+
+  // Historique initial
+  socket.on("chat:history", ({ messages }) => {
+    chatEl.innerHTML = "";
+    (messages || []).forEach(renderMessage);
+    scrollToBottom();
+  });
+
+  // Nouveau message en temps réel
+  socket.on("message:new", (m) => {
+    renderMessage(m);
+    scrollToBottom();
+  });
+
+// Indicateur "est en train d’écrire" (utilisateur réel)
+socket.on("typing:update", ({ user, typing }) => {
+  const name = user?.displayName || user?.username || user?.id || 'Anonyme';
+  if (typing) {
+    typingEl.textContent = `💬 ${name} est en train d’écrire…`;
+    typingEl.style.display = "block";
+  } else {
+    typingEl.style.display = "none";
+    typingEl.textContent = "";
+  }
+});
+
+
+  // ====== Envoi d'un message ======
+  function sendMessage() {
+    const content = (inputEl.value || "").trim();
+    if (!content) return;
+    socket.emit("message:send", { chatId: CHAT_ID, content, senderId: USER_ID });
+    inputEl.value = "";
+    socket.emit("typing:stop", { chatId: CHAT_ID, userId: USER_ID });
+  }
+  window.sendMessage = sendMessage; // nécessaire car appelé via onclick= dans le HTML
+
+  // Enter pour envoyer + typing indicators
+  inputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
+  });
+ inputEl.addEventListener("input", (e) => {
+  if ((e.target.value || "").trim().length > 0) {
+    socket.emit("typing:start", { chatId: CHAT_ID });
+  } else {
+    socket.emit("typing:stop", { chatId: CHAT_ID });
+  }
+});
+
+
+  // ====== Helpers ======
+  function renderMessage(m) {
+    const wrap  = document.createElement("div");
+    wrap.className = "message";
+
+    const author = document.createElement("div");
+    author.className = "message-author";
+    const name = m.sender?.username || m.sender?.email || m.senderId || "Anonyme";
+    const time = new Date(m.createdAt).toLocaleTimeString();
+    author.textContent = `${name} - ${time}`;
+
+    const body = document.createElement("div");
+    body.className = "message-content";
+    body.textContent = m.content;
+
+    wrap.appendChild(author);
+    wrap.appendChild(body);
+    chatEl.appendChild(wrap);
+  }
+
+  function scrollToBottom() {
+    chatEl.scrollTop = chatEl.scrollHeight;
+  }
+</script>
+
 </body>
 </html>

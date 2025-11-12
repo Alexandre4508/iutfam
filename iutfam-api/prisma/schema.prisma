@@ -180,3 +180,44 @@ enum RSVPStatus {
   ACCEPTED
   DECLINED
 }
+
+model CanteenMenu {
+  id           String   @id @default(cuid())
+  date         DateTime @unique      // le menu est lié à une date (un par jour)
+  mainDish     String
+  sideDish     String?
+  veggies      String?
+  dessert      String?
+  priceStudent Decimal? @db.Decimal(5,2)
+  hoursStart   String?  // "11h30"
+  hoursEnd     String?  // "14h00"
+
+  ratings      CanteenRating[]
+  comments     CanteenComment[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CanteenRating {
+  id        String   @id @default(cuid())
+  score     Int      // 1..10
+  userId    String
+  menuId    String
+  menu      CanteenMenu @relation(fields: [menuId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([menuId])
+  @@unique([menuId, userId]) // 1 note / utilisateur / menu
+}
+
+model CanteenComment {
+  id        String   @id @default(cuid())
+  text      String
+  userId    String
+  menuId    String
+  menu      CanteenMenu @relation(fields: [menuId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([menuId])
+}

@@ -1,9 +1,9 @@
-services: 
+services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_USER: iutfam
-      POSTGRES_PASSWORD: iutfam
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: iutfam
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -15,9 +15,11 @@ services:
       context: ./iutfam-api
       dockerfile: Dockerfile
     environment:
-      DATABASE_URL: postgresql://iutfam:iutfam@postgres:5432/iutfam
-      PORT: 4000
-      ALLOWED_EMAIL_DOMAINS: etu-iut.re,iut-reunion.fr   # ✅ ajouté
+      - ALLOWED_EMAIL_DOMAINS=${ALLOWED_EMAIL_DOMAINS}
+      - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - ./iutfam-api/.env   
     depends_on:
       - postgres
     ports:
@@ -44,4 +46,3 @@ services:
 
 volumes:
   pgdata: {}
-

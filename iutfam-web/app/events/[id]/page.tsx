@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { BackToIutfamButton } from "./BackToIutfamButton";
+
 
 type EventDetail = {
   id: string;
@@ -73,9 +75,10 @@ export default async function EventDetailPage(props: {
 
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-4">
-      <Link href="/events" className="underline">
-        ← Retour à la liste
-      </Link>
+    <Link href="http://localhost:3000/legacy/index.html#events" className="underline">
+  ← Retour au site IUTFAM
+</Link>
+
 
       <h1 className="text-2xl font-semibold">{ev.title}</h1>
 

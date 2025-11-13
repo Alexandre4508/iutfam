@@ -160,6 +160,9 @@ async function login(event) {
       localStorage.setItem('token', data.access_token);
     }
 
+// ✅ Flag simple pour dire "je suis connecté dans la legacy"
+localStorage.setItem('iutfam_logged_in', '1');
+
     // 1) cacher login/register/profile
     ["login-page", "register-page", "profile-page"].forEach(id => {
       const el = document.getElementById(id);
@@ -228,10 +231,7 @@ function showSection(id) {
     btn.classList.toggle('active', btn.getAttribute('data-section') === id);
   });
 
-  // si on arrive sur "events", on recharge les données
-  if (id === 'events') {
-    loadEventsLegacy();
-  }
+  
 }
 
 //Brancher tous les boutons de la barre
@@ -280,9 +280,13 @@ function logout() {
   localStorage.removeItem('access_token');
   localStorage.removeItem('token');
 
-  wireNav();        // ⬅️ branche la navbar
+  // ❌ On n’est plus considéré comme connecté dans la legacy
+  localStorage.removeItem('iutfam_logged_in');
+
+  wireNav();
   showLoginPage();
 }
+
 
 function backToApp() {
   // cacher toutes les pages "simples" (landing / login / register / profil)
@@ -308,117 +312,37 @@ function backToApp() {
 // rendre accessible depuis le HTML (onclick="backToApp()")
 window.backToApp = backToApp;
 
-// ============================================
-// ÉVÉNEMENTS (legacy)
-// ============================================
 
-// formate la date comme "10 mars 2025"
-function formatEventDate(iso) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-// construit le texte "Organisé par NOM (RT-1ère année)" etc.
-function buildOrganiserLabel(createdBy) {
-  if (!createdBy) return "Anonyme";
-
-  const creatorName =
-    createdBy.displayName ||
-    createdBy.username ||
-    createdBy.id ||
-    "Anonyme";
-
-  // on essaye de récupérer la formation via la première classe
-  let formation = createdBy.department || null;
-
-  if (!formation && Array.isArray(createdBy.classes) && createdBy.classes.length > 0) {
-    const cg = (createdBy.classes[0] && createdBy.classes[0].classGroup) || {};
-    // dans notre cas, name ressemble souvent à "RT-1ère année", "GEA-2ème année", etc.
-    formation = cg.name || cg.code || cg.department || null;
-  }
-
-  return formation ? `${creatorName} (${formation})` : creatorName;
-}
-
-// rend les cartes dans le conteneur de la page legacy
-function renderEventsLegacy(events) {
-  const container = document.getElementById("events-list");
-  if (!container) {
-    console.warn("[events] conteneur #events-list introuvable");
-    return;
-  }
-
-  container.innerHTML = "";
-
-  events.forEach(ev => {
-    const card = document.createElement("div");
-    card.className = "event-card"; // garde ta classe existante
-
-    const organiserLabel = buildOrganiserLabel(ev.createdBy);
-
-    card.innerHTML = `
-      <div class="event-card-header">
-        <div class="event-title">${ev.title}</div>
-        <div class="event-date">${formatEventDate(ev.startsAt)}</div>
-      </div>
-
-      <div class="event-card-body">
-        <p>📍 ${ev.location || "Lieu à définir"}</p>
-        <p>👥 Aucun participant pour le moment</p>
-        <p>Organisé par ${organiserLabel}</p>
-      </div>
-
-      <div class="event-card-footer">
-        <button class="event-btn event-btn-primary" disabled>
-          Participer
-        </button>
-        <a href="/events/${ev.id}" class="event-btn event-btn-secondary">
-          Détails
-        </a>
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
-}
-
-// va chercher les événements depuis l'API Nest
-async function loadEventsLegacy() {
-  const container = document.getElementById("events-list");
-  if (!container) return;
-
-  container.innerHTML = "<p>Chargement des événements...</p>";
-
-  try {
-    const res = await fetch(`${API_URL}/events`, { credentials: "include" });
-    if (!res.ok) {
-      throw new Error("HTTP " + res.status);
-    }
-    const events = await res.json(); // tableau
-    renderEventsLegacy(events);
-  } catch (err) {
-    console.error("[events] erreur:", err);
-    container.innerHTML = `<p class="text-red">Impossible de charger les événements : ${
-      err.message || err
-    }</p>`;
-  }
-}
-
-// on le rend dispo au besoin
-window.loadEventsLegacy = loadEventsLegacy;
 
 
 // ============================================
 // Initialisation
 // ============================================
 document.addEventListener("DOMContentLoaded", () => {
-  showLoginPage();
+  // Est-ce qu'on a déjà une session "legacy" ouverte ?
+  const loggedFlag = localStorage.getItem('iutfam_logged_in') === '1';
+
+  if (loggedFlag) {
+    // On affiche directement l'application
+    backToApp();
+
+    // Si l'URL contient #events, on va directement sur l'onglet événements
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'events') {
+      showSection('events');
+    }
+  } else {
+    // Pas connecté → page de login
+    showLoginPage();
+  }
 
   // ✅ branche les formulaires
-  document.getElementById('register-form')?.addEventListener('submit', e => register(e));
-  document.getElementById('login-form')?.addEventListener('submit', e => login(e));
+  document
+    .getElementById('register-form')
+    ?.addEventListener('submit', (e) => register(e));
+
+  document
+    .getElementById('login-form')
+    ?.addEventListener('submit', (e) => login(e));
 });
+

@@ -14,7 +14,7 @@
                 <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/3d7c6c29-ee4d-4964-81b0-f4659319b685.png" alt="IUTFAM Logo" class="logo-main">
                 <h1>Bienvenue sur IUTFAM</h1>
                 <p class="welcome-text">La plateforme qui connecte tous les étudiants de l'IUT de la Réunion ! 🌺</p>
-                
+               
                 <div class="welcome-features">
                     <div class="feature-card">
                         <h3>🗣️ Chat & Communauté</h3>
@@ -34,10 +34,12 @@
                     </div>
                 </div>
 
+
                 <div class="auth-buttons">
                     <button type="button" class="btn btn--primary btn--lg" onclick="showLoginPage()">Se Connecter</button>
                     <button type="button" class="btn btn--secondary btn--lg" onclick="showRegisterPage()">S'inscrire</button>
                 </div>
+
 
                 <div style="margin-top: 20px;">
                     <button type="button" class="btn btn--outline" onclick="demoLogin()">🎯 Connexion démo (Marie)</button>
@@ -45,6 +47,7 @@
             </div>
         </header>
     </div>
+
 
     <!-- Page d'inscription -->
     <div id="register-page" class="page">
@@ -104,6 +107,7 @@
         </div>
     </div>
 
+
     <!-- Page de connexion -->
     <div id="login-page" class="page">
       <div class="auth-container">
@@ -111,19 +115,23 @@
           <img src="/legacy/logo-iutfam.jpeg" alt="IUTFAM" style="max-width:160px; height:auto;" />
           <h2>Se connecter à IUTFAM</h2>
 
+
           <form id="login-form" onsubmit="return login(event)">
             <div class="form-group">
               <label class="form-label" for="login-email">Email</label>
               <input type="email" class="form-control" id="login-email" required />
             </div>
 
+
             <div class="form-group">
               <label class="form-label" for="login-password">Mot de passe</label>
               <input type="password" class="form-control" id="login-password" required />
             </div>
 
+
             <button type="submit" class="btn btn--primary btn--full-width">Se connecter</button>
           </form>
+
 
           <div class="demo-credentials">
               <h4>Comptes de démonstration :</h4>
@@ -134,6 +142,7 @@
               </div>
           </div>
 
+
           <p class="auth-link">
             Pas encore inscrit ?
             <!-- remplacé par data-action -->
@@ -143,6 +152,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- Application principale -->
     <div id="main-app" class="app">
@@ -173,6 +183,7 @@
             </div>
         </nav>
 
+
         <!-- Contenu principal -->
         <main class="main-content">
             <!-- Dashboard -->
@@ -180,7 +191,7 @@
                 <div class="container">
                     <h1>Tableau de bord</h1>
                     <p class="welcome-message">Bienvenue sur IUTFAM, <span id="dashboardUserName">Utilisateur</span>! 🌺</p>
-                    
+                   
                     <div class="dashboard-grid">
                         <div class="card">
                             <div class="card__body">
@@ -196,6 +207,7 @@
                                 <button type="button" class="btn btn--primary btn--sm" onclick="showSection('chat')">Voir le chat</button>
                             </div>
                         </div>
+
 
                         <div class="card">
                             <div class="card__body">
@@ -214,6 +226,7 @@
                             </div>
                         </div>
 
+
                         <div class="card">
                             <div class="card__body">
                                 <h3>🍽️ Menu du jour</h3>
@@ -224,6 +237,7 @@
                                 <button type="button" class="btn btn--primary btn--sm" onclick="showSection('canteen')">Voir le menu complet</button>
                             </div>
                         </div>
+
 
                         <div class="card">
                             <div class="card__body">
@@ -239,6 +253,7 @@
                 </div>
             </section>
 
+
             <!-- Chat général -->
 <section id="chat" class="section">
   <div class="container">
@@ -248,8 +263,10 @@
         <!-- (tes messages d’exemple peuvent rester ou être vides) -->
       </div>
 
+
       <!-- petit indicateur de frappe -->
       <div id="typingIndicator" class="message" style="display:none; opacity:.7"></div>
+
 
       <div class="chat-input">
         <input type="text" id="messageInput" placeholder="Tapez votre message..." class="form-control">
@@ -258,6 +275,8 @@
     </div>
   </div>
 </section>
+
+
 
 
             <!-- Amis -->
@@ -269,12 +288,13 @@
                             <input type="text" placeholder="Rechercher un étudiant..." class="form-control">
                             <button type="button" class="btn btn--primary">Rechercher</button>
                         </div>
-                        
+                       
                         <div class="friends-tabs">
                             <button type="button" class="btn btn--secondary active" data-tab="friends">Mes amis (3)</button>
                             <button type="button" class="btn btn--secondary" data-tab="requests">Demandes (2)</button>
                             <button type="button" class="btn btn--secondary" data-tab="search">Recherche</button>
                         </div>
+
 
                         <div id="friends-list" class="friends-list">
                             <div class="friend-card">
@@ -296,6 +316,7 @@
                 </div>
             </section>
 
+
             <!-- Groupes de classe -->
             <section id="groups" class="section">
                 <div class="container">
@@ -311,6 +332,7 @@
                                 <button type="button" class="btn btn--outline" onclick="leaveGroup()">Quitter le groupe</button>
                             </div>
                         </div>
+
 
                         <div class="other-groups">
                             <h3>Autres groupes disponibles</h3>
@@ -329,6 +351,7 @@
                 </div>
             </section>
 
+
             <!-- Événements -->
             <section id="events" class="section">
                 <div class="container">
@@ -336,28 +359,41 @@
                     <div class="events-header">                        
                         <a class="nav-btn" href="/events">🎉 Événements</a>
 
+
                         <button type="button" class="btn btn--primary" onclick="showCreateEvent()">+ Créer un événement</button>
                        <a id="create-event" class="btn" href="/events/new">+ Créer un événement</a>
 
+
                     </div>
-                    
-                    <div class="events-grid" id="events-list">
-                        <div class="event-card">
-                            <div class="event-header">
-                                <h3>Repas cantine ensemble</h3>
-                                <span class="event-date">15 septembre 2025</span>
-                            </div>
-                            <div class="event-details">
-                                <p>📍 Cantine IUT</p>
-                                <p>👥 5 participants</p>
-                                <p>Organisé par Marie (GEA)</p>
-                            </div>
-                            <div class="event-actions">
-                                <button type="button" class="btn btn--primary btn--sm">✅ Participer</button>
-                                <a class="btn btn--outline btn--sm" data-event="details" href="#">ℹ️ Détails</a>
+                   
+                    <div id="events-list">
+                       <!-- Carte modèle cachée : sert de TEMPLATE -->
+  <div class="event-card" id="event-template" style="display: none;">
+    <div class="event-card-header">
+      <div class="event-title" data-role="title">Titre de l’événement</div>
+      <div class="event-date" data-role="date">01 janvier 2025</div>
+    </div>
+
+
+    <div class="event-card-body">
+      <p>📍 <span data-role="location">Lieu</span></p>
+      <p>👥 <span data-role="participants">Aucun participant pour le moment</span></p>
+      <p>Organisé par <span data-role="organiser">Nom (Formation)</span></p>
+    </div>
+
+
+    <div class="event-card-footer">
+      <button class="event-btn event-btn-primary" disabled>
+        Participer
+      </button>
+      <a href="#" class="event-btn event-btn-secondary" data-role="details">
+        Détails
+      </a>
+
 
                             </div>
                         </div>
+
 
                         <div class="event-card">
                             <div class="event-header">
@@ -373,11 +409,13 @@
                                 <button type="button" class="btn btn--primary btn--sm">✅ Participer</button>
                                 <a class="btn btn--outline btn--sm" data-event="details" href="#">ℹ️ Détails</a>
 
+
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
 
             <!-- Carte -->
             <section id="map" class="section">
@@ -401,6 +439,7 @@
                 </div>
             </section>
 
+
             <!-- Board / Forum -->
             <section id="board" class="section">
                 <div class="container">
@@ -408,7 +447,7 @@
                     <div class="board-header">
                         <button type="button" class="btn btn--primary" onclick="showCreatePost()">+ Nouveau post</button>
                     </div>
-                    
+                   
                     <div class="board-categories">
                         <button type="button" class="btn btn--secondary active">Tout</button>
                         <button type="button" class="btn btn--secondary">📚 Études</button>
@@ -416,6 +455,7 @@
                         <button type="button" class="btn btn--secondary">💼 Emploi</button>
                         <button type="button" class="btn btn--secondary">📝 Divers</button>
                     </div>
+
 
                     <div class="posts-list">
                         <div class="post-card">
@@ -430,6 +470,7 @@
                                 <button type="button" class="btn btn--outline btn--sm">💬 2 commentaires</button>
                             </div>
                         </div>
+
 
                         <div class="post-card">
                             <div class="post-header">
@@ -447,6 +488,7 @@
                 </div>
             </section>
 
+
             <!-- Menu Cantine -->
             <section id="canteen" class="section">
                 <div class="container">
@@ -454,7 +496,7 @@
                     <div class="canteen-header">
                         <button type="button" class="btn btn--primary">📸 Poster le menu du jour</button>
                     </div>
-                    
+                   
                     <div class="menu-today">
                         <div class="card">
                             <div class="card__body">
@@ -477,6 +519,7 @@
                         </div>
                     </div>
 
+
                     <div class="menu-history">
                         <h3>Menus précédents</h3>
                         <div class="menu-card">
@@ -487,6 +530,7 @@
                 </div>
             </section>
 
+
             <!-- Lost & Found -->
             <section id="lostfound" class="section">
                 <div class="container">
@@ -495,11 +539,12 @@
                         <button type="button" class="btn btn--primary">+ Déclarer un objet trouvé</button>
                         <button type="button" class="btn btn--secondary">+ Déclarer une perte</button>
                     </div>
-                    
+                   
                     <div class="lostfound-tabs">
                         <button type="button" class="btn btn--secondary active">🔍 Objets trouvés</button>
                         <button type="button" class="btn btn--secondary">❓ Objets perdus</button>
                     </div>
+
 
                     <div class="lostfound-items">
                         <div class="item-card">
@@ -513,6 +558,7 @@
                                 <button type="button" class="btn btn--primary btn--sm">📞 Contacter</button>
                             </div>
                         </div>
+
 
                         <div class="item-card">
                             <div class="item-info">
@@ -529,6 +575,7 @@
                 </div>
             </section>
 
+
             <!-- Transport / Covoiturage -->
             <section id="transport" class="section">
                 <div class="container">
@@ -537,11 +584,12 @@
                         <button type="button" class="btn btn--primary">+ Proposer un covoiturage</button>
                         <button type="button" class="btn btn--secondary">+ Chercher un trajet</button>
                     </div>
-                    
+                   
                     <div class="transport-tabs">
                         <button type="button" class="btn btn--secondary active">🚗 Covoiturages</button>
                         <button type="button" class="btn btn--secondary">🚌 Transports en commun</button>
                     </div>
+
 
                     <div class="carpooling-offers">
                         <div class="carpooling-card">
@@ -559,6 +607,7 @@
                                 <button type="button" class="btn btn--outline btn--sm">⭐ Réserver</button>
                             </div>
                         </div>
+
 
                         <div class="carpooling-card">
                             <div class="carpooling-route">
@@ -581,6 +630,7 @@
         </main>
     </div>
 
+
     <!-- Page profil -->
     <div id="profile-page" class="page">
         <div class="container">
@@ -589,7 +639,7 @@
                     <h1>⚙️ Mon profil</h1>
                     <button type="button" class="btn btn--outline" onclick="backToApp()">← Retour</button>
                 </div>
-                
+               
                 <div class="profile-content">
                     <div class="profile-form">
                         <div class="form-group">
@@ -599,22 +649,22 @@
                                 <button type="button" class="btn btn--secondary btn--sm">Changer</button>
                             </div>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label">Prénom</label>
                             <input type="text" class="form-control" id="profileFirstName">
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label">Nom</label>
                             <input type="text" class="form-control" id="profileLastName">
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label">Email</label>
                             <input type="email" class="form-control" id="profileEmail" readonly>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label">Département</label>
                             <select class="form-control" id="profileDepartment">
@@ -627,7 +677,7 @@
                                 <option value="TC">Techniques de Commercialisation (TC)</option>
                             </select>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label">Année d'étude</label>
                             <select class="form-control" id="profileYear">
@@ -636,12 +686,12 @@
                                 <option value="3ème année">3ème année</option>
                             </select>
                         </div>
-                        
+                       
                         <div class="form-group">
                             <label class="form-label">Centres d'intérêt</label>
                             <textarea class="form-control" id="profileInterests" placeholder="Sport, musique, voyages..."></textarea>
                         </div>
-                        
+                       
                         <div class="profile-actions">
                             <button type="button" class="btn btn--primary" onclick="saveProfile()">Sauvegarder</button>
                             <button type="button" class="btn btn--outline" onclick="backToApp()">Annuler</button>
@@ -651,6 +701,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Modals -->
     <div id="privateChat" class="modal hidden">
@@ -674,27 +725,33 @@
         </div>
     </div>
 
+
     <script src="/legacy/app.js"></script>
     <!-- Client Socket.IO -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 
 <script>
   // ====== Config locale ======
   const CHAT_ID = "GENERAL_SINGLETON"; // tu peux passer à 'general' si tu as créé ce chat
   const USER_ID = "u_dev";             // à remplacer plus tard par l'ID du user connecté
 
+
   // ====== Références DOM ======
   const chatEl   = document.getElementById("chatMessages");
   const inputEl  = document.getElementById("messageInput");
   const typingEl = document.getElementById("typingIndicator");
 
+
   // ====== Connexion Socket.IO ======
   const socket = io(API_URL, { withCredentials: true, transports: ["websocket"] });
+
 
   socket.on("connect", () => {
     console.log("Socket.IO connecté", socket.id);
     socket.emit("chat:join", { chatId: CHAT_ID, limit: 50 });
   });
+
 
   // Historique initial
   socket.on("chat:history", ({ messages }) => {
@@ -703,11 +760,13 @@
     scrollToBottom();
   });
 
+
   // Nouveau message en temps réel
   socket.on("message:new", (m) => {
     renderMessage(m);
     scrollToBottom();
   });
+
 
 // Indicateur "est en train d’écrire" (utilisateur réel)
 socket.on("typing:update", ({ user, typing }) => {
@@ -722,6 +781,8 @@ socket.on("typing:update", ({ user, typing }) => {
 });
 
 
+
+
   // ====== Envoi d'un message ======
   function sendMessage() {
     const content = (inputEl.value || "").trim();
@@ -731,6 +792,7 @@ socket.on("typing:update", ({ user, typing }) => {
     socket.emit("typing:stop", { chatId: CHAT_ID, userId: USER_ID });
   }
   window.sendMessage = sendMessage; // nécessaire car appelé via onclick= dans le HTML
+
 
   // Enter pour envoyer + typing indicators
   inputEl.addEventListener("keydown", (e) => {
@@ -745,10 +807,13 @@ socket.on("typing:update", ({ user, typing }) => {
 });
 
 
+
+
   // ====== Helpers ======
   function renderMessage(m) {
     const wrap  = document.createElement("div");
     wrap.className = "message";
+
 
     const author = document.createElement("div");
     author.className = "message-author";
@@ -756,14 +821,17 @@ socket.on("typing:update", ({ user, typing }) => {
     const time = new Date(m.createdAt).toLocaleTimeString();
     author.textContent = `${name} - ${time}`;
 
+
     const body = document.createElement("div");
     body.className = "message-content";
     body.textContent = m.content;
+
 
     wrap.appendChild(author);
     wrap.appendChild(body);
     chatEl.appendChild(wrap);
   }
+
 
   function scrollToBottom() {
     chatEl.scrollTop = chatEl.scrollHeight;
@@ -773,19 +841,33 @@ socket.on("typing:update", ({ user, typing }) => {
 (async () => {
   const API = "http://localhost:4000";
 
+
   function formatCreator(ev) {
-    const u = ev.createdBy || {};
-    const name = u.displayName || u.username || "Anonyme";
+  const u = ev.createdBy || {};
+  const name =
+    u.displayName ||
+    u.username ||
+    u.id ||
+    "Anonyme";
 
-    const cg = u.classGroup || {};
-    // On essaie d’avoir quelque chose du style "GEA1" ou "GEA"
-    const formation =
-      cg.department ||
-      cg.code ||
-      (cg.name ? cg.name : "");
 
-    return formation ? `${name} (${formation})` : name;
+  // 1) si le user a directement un department
+  let formation = u.department || null;
+
+
+  // 2) sinon on regarde la première classe
+  if (!formation && Array.isArray(u.classes) && u.classes.length > 0) {
+    const cg = (u.classes[0] && u.classes[0].classGroup) || {};
+    // ex : "RT-1ère année", "GEA-2ème année", etc.
+    formation = cg.name || cg.code || cg.department || null;
   }
+
+
+  return formation ? `${name} (${formation})` : name;
+}
+
+
+
 
   try {
     const res = await fetch(`${API}/events`, { cache: "no-store" });
@@ -794,9 +876,11 @@ socket.on("typing:update", ({ user, typing }) => {
       return;
     }
 
+
     const events = await res.json();
     const container = document.getElementById("events-list");
     if (!container) return;
+
 
     if (!Array.isArray(events) || events.length === 0) {
       container.innerHTML = `
@@ -804,6 +888,7 @@ socket.on("typing:update", ({ user, typing }) => {
       `;
       return;
     }
+
 
     const html = events.map(ev => {
       const date = ev.startsAt
@@ -814,7 +899,9 @@ socket.on("typing:update", ({ user, typing }) => {
           })
         : "Date inconnue";
 
+
       const organiser = formatCreator(ev);
+
 
       return `
         <div class="event-card">
@@ -823,11 +910,13 @@ socket.on("typing:update", ({ user, typing }) => {
             <span class="event-date">${date}</span>
           </div>
 
+
           <div class="event-details">
             <p>📍 ${ev.location || "Lieu inconnu"}</p>
             <p>👥 Nouvel événement</p>
             <p>Organisé par ${organiser}</p>
           </div>
+
 
           <div class="event-actions">
             <button type="button" class="btn btn--primary btn--sm" disabled>
@@ -841,6 +930,7 @@ socket.on("typing:update", ({ user, typing }) => {
       `;
     }).join("");
 
+
     container.innerHTML = html;
   } catch (err) {
     console.warn("Erreur lors du chargement des événements :", err);
@@ -849,5 +939,9 @@ socket.on("typing:update", ({ user, typing }) => {
 </script>
 
 
+
+
 </body>
 </html>
+
+

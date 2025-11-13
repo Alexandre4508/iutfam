@@ -6,6 +6,9 @@ import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CanteenModule } from './canteen/canteen.module';
+import { EventsModule } from './events/events.module';
+import { EventsController } from './events/events.controller';
+
 
 @Module({
   imports: [
@@ -13,8 +16,9 @@ import { CanteenModule } from './canteen/canteen.module';
     AuthModule,
     UsersModule,            
     MessagesModule, CanteenModule,
+    EventsModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController,],
   providers: [AppService],
 })
 export class AppModule {}

@@ -15,7 +15,7 @@ services:
       context: ./iutfam-api
       dockerfile: Dockerfile
     environment:
-      - ALLOWED_EMAIL_DOMAINS=${ALLOWED_EMAIL_DOMAINS}
+      - ALLOWED_EMAIL_DOMAINS=*,iutfam.local,etu-iut.re,univ-reunion.fr,iut.re
       - JWT_SECRET=${JWT_SECRET}
       - DATABASE_URL=${DATABASE_URL}
     env_file:

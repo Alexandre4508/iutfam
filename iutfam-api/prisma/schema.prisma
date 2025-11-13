@@ -20,7 +20,7 @@ model User {
   BoardPost    BoardPost[]
   canteenPosts CanteenPost[]
   chats        ChatParticipant[]
-  events       Event[]           @relation("Creator")
+  events       Event[]           @relation("UserCreatedEvents")
   invites      EventInvite[]
   friendsB     FriendRequest[]   @relation("B")
   friendsA     FriendRequest[]   @relation("A")
@@ -89,17 +89,22 @@ model Message {
 }
 
 model Event {
-  id          String        @id @default(cuid())
-  creatorId   String
+  id          String    @id @default(cuid())
   title       String
   description String?
-  date        DateTime
   location    String?
-  lat         Float?
-  lng         Float?
-  scope       EventScope
-  creator     User          @relation("Creator", fields: [creatorId], references: [id])
+  startsAt    DateTime
+  endsAt      DateTime?
+  published   Boolean   @default(true)
+
+  createdById String
+  createdBy   User          @relation("UserCreatedEvents", fields: [createdById], references: [id])
   invites     EventInvite[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([startsAt, published])
 }
 
 model EventInvite {
@@ -112,6 +117,8 @@ model EventInvite {
   user      User       @relation(fields: [userId], references: [id])
 
   @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
 }
 
 model BoardPost {
@@ -183,41 +190,41 @@ enum RSVPStatus {
 
 model CanteenMenu {
   id           String   @id @default(cuid())
-  date         DateTime @unique      // le menu est lié à une date (un par jour)
+  date         DateTime @unique // le menu est lié à une date (un par jour)
   mainDish     String
   sideDish     String?
   veggies      String?
   dessert      String?
-  priceStudent Decimal? @db.Decimal(5,2)
-  hoursStart   String?  // "11h30"
-  hoursEnd     String?  // "14h00"
+  priceStudent Decimal? @db.Decimal(5, 2)
+  hoursStart   String? // "11h30"
+  hoursEnd     String? // "14h00"
 
-  ratings      CanteenRating[]
-  comments     CanteenComment[]
+  ratings  CanteenRating[]
+  comments CanteenComment[]
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model CanteenRating {
-  id        String   @id @default(cuid())
-  score     Int      // 1..10
+  id        String      @id @default(cuid())
+  score     Int // 1..10
   userId    String
   menuId    String
   menu      CanteenMenu @relation(fields: [menuId], references: [id])
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
 
-  @@index([menuId])
   @@unique([menuId, userId]) // 1 note / utilisateur / menu
+  @@index([menuId])
 }
 
 model CanteenComment {
-  id        String   @id @default(cuid())
+  id        String      @id @default(cuid())
   text      String
   userId    String
   menuId    String
   menu      CanteenMenu @relation(fields: [menuId], references: [id])
-  createdAt DateTime @default(now())
+  createdAt DateTime    @default(now())
 
   @@index([menuId])
 }

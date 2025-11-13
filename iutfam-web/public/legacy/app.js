@@ -1,7 +1,7 @@
 // ============================================
 // Application state
 // ============================================
-const API = 'http://localhost:4000'; // backend NestJS (port 4000)
+const API_URL = 'http://localhost:4000'; // backend NestJS (port 4000)
 
 // Simulated "database" fallback (non utilisé pour le moment)
 let users = [];
@@ -61,60 +61,62 @@ function showHomePage() {
 // ============================================
 // Inscription (connectée à ton backend NestJS)
 // ============================================
-async function register(event) {
-  if (event) event.preventDefault(); // <-- empêche la soumission native
-  console.log('Register function called');
+async function register(ev) {
+  ev.preventDefault();
+  const firstName = (document.getElementById('firstName').value || '').trim();
+  const lastName  = (document.getElementById('lastName').value || '').trim();
+  const email     = (document.getElementById('email').value || '').trim();
+  const password  = (document.getElementById('password').value || '').trim();
+  const department= (document.getElementById('department').value || '').trim();
+  const year      = (document.getElementById('year').value || '').trim();
 
-  const firstName  = document.getElementById('firstName')?.value.trim();
-  const lastName   = document.getElementById('lastName')?.value.trim();
-  const email      = document.getElementById('email')?.value.trim();
-  const password   = document.getElementById('password')?.value;
-  const department = document.getElementById('department')?.value;
-  const year       = document.getElementById('year')?.value;
+  // username simple basé sur prénom.nom
+  const username = (firstName && lastName)
+    ? `${firstName}.${lastName}`.toLowerCase().replace(/\s+/g,'')
+    : email.split('@')[0];
 
-  console.log('Form data:', { firstName, lastName, email, department, year });
-
-  // Vérifications de base
-  if (!firstName || !lastName || !email || !password || !department || !year) {
-    alert('Veuillez remplir tous les champs');
-    return false;
-  }
-  if (!validateEmail(email)) {
-    alert('Veuillez utiliser un email universitaire (@iut.re ou @univ-reunion.fr)');
-    return false;
-  }
-
-  // Préparation des données pour le backend
-  const username    = (firstName + '.' + lastName).toLowerCase().replace(/\s+/g, '');
-  const displayName = `${firstName} ${lastName}`;
-  const className   = `${department}-${year}`; // ✅ sans espaces autour du tiret
+  // 👉 IMPORTANT : envoyer un className pour que le back ne plante pas
+  // Par ex : "GEA-1", "RT-2", etc.
+  const className = `${department || 'GEN'}-${year || '1'}`;
 
   try {
-    const res = await fetch(`${API}/auth/register`, {
+    const res = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ email, username, password, displayName, className }),
+      body: JSON.stringify({
+        email,
+        username,
+        password,
+        displayName: `${firstName} ${lastName}`.trim(),
+        className,   // 👈 ajouté pour que le controller puisse créer la classe
+      }),
     });
 
-    // essaie de lire la réponse JSON pour remonter un message clair en cas d’erreur
-    let data = {};
-    try { data = await res.json(); } catch (_) {}
+    const data = await res.json().catch(() => ({}));
 
-    if (!res.ok) {
-      const msg = data?.message || data?.error || `Erreur ${res.status}`;
-      throw new Error(Array.isArray(msg) ? msg.join(', ') : msg);
+    // on considère succès si HTTP OK + { ok: true }
+    if (!res.ok || data.ok !== true) {
+      throw new Error(data.message || `Erreur ${res.status}`);
     }
 
-    alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
-    showLoginPage();
-    return false;
+    const display =
+      data.user?.displayName ||
+      `${firstName} ${lastName}`.trim() ||
+      username ||
+      email;
+
+    document.getElementById('currentUserName').textContent = display;
+    document.getElementById('dashboardUserName').textContent = display;
+
+    backToApp();          // ouvre l’app
+    showSection('events'); // onglet événements
   } catch (err) {
-    console.error(err);
-    alert(String(err.message || err));
-    return false;
+    alert(`Inscription impossible : ${err.message || err}`);
   }
+  return false;
 }
+window.register = register;
+
 
 // ============================================
 // Connexion ( pour éviter la page blanche)
@@ -133,7 +135,7 @@ async function login(event) {
   }
 
   try {
-    const res = await fetch(`${API}/auth/login`, {
+  const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -263,6 +265,31 @@ function logout() {
   wireNav();        // ⬅️ branche la navbar
   showLoginPage();
 }
+
+function backToApp() {
+  // cacher toutes les pages "simples" (landing / login / register / profil)
+  document.querySelectorAll('.page').forEach(el => (el.style.display = 'none'));
+
+  // afficher l'application principale
+  const app = document.getElementById('main-app');
+  if (app) app.style.display = 'block';
+
+  // par défaut, on montre le dashboard
+  document.querySelectorAll('#main-app .section').forEach(sec => {
+    const isDashboard = sec.id === 'dashboard';
+    sec.style.display = isDashboard ? 'block' : 'none';
+    sec.classList.toggle('active', isDashboard);
+  });
+
+  // activer le bouton "Accueil" dans la barre de nav
+  document.querySelectorAll('.nav-link').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-section') === 'dashboard');
+  });
+}
+
+// rendre accessible depuis le HTML (onclick="backToApp()")
+window.backToApp = backToApp;
+
 
 // ============================================
 // Initialisation

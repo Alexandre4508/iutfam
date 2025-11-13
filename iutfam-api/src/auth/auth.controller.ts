@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto, LoginDto } from './dto';
 import { isEmailAllowed } from './utils';
+import { Prisma } from '@prisma/client';
+
 
 @Controller('auth')
 export class AuthController {

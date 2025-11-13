@@ -6,31 +6,81 @@ import { CreateEventDto } from './dto/create-event.dto';
 export class EventsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  // GET /events : liste des événements
   list() {
     return this.prisma.event.findMany({
       where: { published: true },
       orderBy: { startsAt: 'asc' },
       select: {
-        id: true, title: true, location: true, startsAt: true, endsAt: true,
-        createdAt: true, createdById: true,
+        id: true,
+        title: true,
+        location: true,
+        startsAt: true,
+        endsAt: true,
+        createdAt: true,
+        // ⬇️ infos du créateur
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            department: true, // "GEA", "RT", etc. si renseigné
+            classes: {
+              select: {
+                classGroup: {
+                  select: {
+                    name: true, // ex: "BUT GEA 1"
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
 
+  // GET /events/:id : détail
   async byId(id: string) {
     const ev = await this.prisma.event.findUnique({
       where: { id },
       select: {
-        id: true, title: true, description: true, location: true,
-        startsAt: true, endsAt: true, published: true,
-        createdAt: true, updatedAt: true,
-        createdBy: { select: { id: true, username: true, displayName: true } },
+        id: true,
+        title: true,
+        description: true,
+        location: true,
+        startsAt: true,
+        endsAt: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+        createdBy: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            department: true,
+            classes: {
+              select: {
+                classGroup: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
-    if (!ev) throw new NotFoundException('Event not found');
+
+    if (!ev) {
+      throw new NotFoundException('Event not found');
+    }
     return ev;
   }
 
+  // POST /events
   async create(userId: string, dto: CreateEventDto) {
     return this.prisma.event.create({
       data: {

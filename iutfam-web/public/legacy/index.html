@@ -773,6 +773,20 @@ socket.on("typing:update", ({ user, typing }) => {
 (async () => {
   const API = "http://localhost:4000";
 
+  function formatCreator(ev) {
+    const u = ev.createdBy || {};
+    const name = u.displayName || u.username || "Anonyme";
+
+    const cg = u.classGroup || {};
+    // On essaie d’avoir quelque chose du style "GEA1" ou "GEA"
+    const formation =
+      cg.department ||
+      cg.code ||
+      (cg.name ? cg.name : "");
+
+    return formation ? `${name} (${formation})` : name;
+  }
+
   try {
     const res = await fetch(`${API}/events`, { cache: "no-store" });
     if (!res.ok) {
@@ -784,7 +798,6 @@ socket.on("typing:update", ({ user, typing }) => {
     const container = document.getElementById("events-list");
     if (!container) return;
 
-    // Aucun événement
     if (!Array.isArray(events) || events.length === 0) {
       container.innerHTML = `
         <p class="menu-preview">Aucun événement pour le moment. Crée le premier ! 🎉</p>
@@ -801,7 +814,7 @@ socket.on("typing:update", ({ user, typing }) => {
           })
         : "Date inconnue";
 
-      const organiser = ev.createdById || "Anonyme";
+      const organiser = formatCreator(ev);
 
       return `
         <div class="event-card">
@@ -812,15 +825,14 @@ socket.on("typing:update", ({ user, typing }) => {
 
           <div class="event-details">
             <p>📍 ${ev.location || "Lieu inconnu"}</p>
-            <p>👥 Nouveau</p>
-            <p>Organisé par : ${organiser}</p>
+            <p>👥 Nouvel événement</p>
+            <p>Organisé par ${organiser}</p>
           </div>
 
           <div class="event-actions">
             <button type="button" class="btn btn--primary btn--sm" disabled>
               ✅ Participer
             </button>
-
             <a class="btn btn--outline btn--sm" href="/events/${ev.id}">
               ℹ️ Détails
             </a>
@@ -830,7 +842,6 @@ socket.on("typing:update", ({ user, typing }) => {
     }).join("");
 
     container.innerHTML = html;
-
   } catch (err) {
     console.warn("Erreur lors du chargement des événements :", err);
   }

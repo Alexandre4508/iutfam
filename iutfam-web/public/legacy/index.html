@@ -280,41 +280,81 @@
 
 
             <!-- Amis -->
-            <section id="friends" class="section">
-                <div class="container">
-                    <h1>👥 Mes amis</h1>
-                    <div class="friends-content">
-                        <div class="friends-search">
-                            <input type="text" placeholder="Rechercher un étudiant..." class="form-control">
-                            <button type="button" class="btn btn--primary">Rechercher</button>
-                        </div>
-                       
-                        <div class="friends-tabs">
-                            <button type="button" class="btn btn--secondary active" data-tab="friends">Mes amis (3)</button>
-                            <button type="button" class="btn btn--secondary" data-tab="requests">Demandes (2)</button>
-                            <button type="button" class="btn btn--secondary" data-tab="search">Recherche</button>
-                        </div>
+           
+<section id="friends" class="section">
+  <div class="container">
+    <h1>👥 Mes amis</h1>
 
+    <!-- Recherche -->
+    <div class="friends-search">
+      <input
+        id="friends-search-input"
+        type="text"
+        placeholder="Rechercher un étudiant..."
+        class="form-control"
+      >
+      <button id="friends-search-btn" type="button" class="btn btn--primary">
+        Rechercher
+      </button>
+    </div>
 
-                        <div id="friends-list" class="friends-list">
-                            <div class="friend-card">
-                                <div class="friend-info">
-                                    <strong>Marie Dubois</strong>
-                                    <span>GEA - 2ème année</span>
-                                </div>
-                                <button type="button" class="btn btn--primary btn--sm" onclick="openPrivateChat('Marie')">💬 Message</button>
-                            </div>
-                            <div class="friend-card">
-                                <div class="friend-info">
-                                    <strong>Thomas Martin</strong>
-                                    <span>RT - 1ère année</span>
-                                </div>
-                                <button type="button" class="btn btn--primary btn--sm" onclick="openPrivateChat('Thomas')">💬 Message</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+    <!-- Onglets -->
+    <div class="friends-tabs">
+      <button
+        type="button"
+        class="btn btn--secondary active"
+        id="friends-tab-friends"
+        data-tab="friends"
+      >
+        Mes amis (<span id="friends-count">0</span>)
+      </button>
+      <button
+        type="button"
+        class="btn btn--secondary"
+        id="friends-tab-requests"
+        data-tab="requests"
+      >
+        Demandes (0)
+      </button>
+      <button
+        type="button"
+        class="btn btn--secondary"
+        id="friends-tab-addedme"
+        data-tab="addedme"
+      >
+        M'ont ajouté (<span id="friends-addedme-count">0</span>)
+      </button>
+    </div>
+
+    <!-- Résultats de recherche -->
+    <div id="friends-search-results" class="friends-list" style="margin-top:1rem;"></div>
+
+    <!-- Mes amis -->
+    <div id="friends-list" class="friends-list" data-tab-content="friends">
+      <p class="menu-preview">Chargement...</p>
+    </div>
+
+    <!-- Demandes envoyées (pour l’instant juste un texte) -->
+    <div
+      id="friends-requests"
+      class="friends-list"
+      data-tab-content="requests"
+      style="display:none;"
+    >
+      <p class="menu-preview">Les demandes envoyées ne sont pas encore affichées.</p>
+    </div>
+
+    <!-- M'ont ajouté (demandes reçues) -->
+    <div
+      id="friends-addedme"
+      class="friends-list"
+      data-tab-content="addedme"
+      style="display:none;"
+    >
+      <p class="menu-preview">Chargement...</p>
+    </div>
+  </div>
+</section>
 
 
             <!-- Groupes de classe -->
@@ -940,8 +980,289 @@ socket.on("typing:update", ({ user, typing }) => {
 
 
 
+<script>
+(function () {
+  const API = "http://localhost:4000";
+
+  // ====== DOM ======
+  const searchInput = document.getElementById("friends-search-input");
+  const searchBtn = document.getElementById("friends-search-btn");
+
+  const friendsTab = document.getElementById("friends-tab-friends");
+  const requestsTab = document.getElementById("friends-tab-requests");
+  const addedMeTab = document.getElementById("friends-tab-addedme");
+
+  const friendsListEl = document.getElementById("friends-list");
+  const requestsListEl = document.getElementById("friends-requests");
+  const addedMeListEl = document.getElementById("friends-addedme");
+
+  const friendsCountEl = document.getElementById("friends-count");
+  const addedMeCountEl = document.getElementById("friends-addedme-count");
+
+  const searchResultsEl = document.getElementById("friends-search-results");
+
+  if (!searchInput || !friendsTab) {
+    // la section amis n'est pas présente
+    return;
+  }
+
+  // ====== utils ======
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  // force pas de cache + ajoute un petit paramètre pour éviter les réponses en cache
+  async function fetchJson(path) {
+    const sep = path.includes("?") ? "&" : "?";
+    const res = await fetch(API + path + sep + "_ts=" + Date.now(), {
+      credentials: "include",
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status + " on " + path);
+    }
+    return res.json();
+  }
+
+  // ====== TABS ======
+  function setActiveTab(tab) {
+    const isFriends = tab === "friends";
+    const isRequests = tab === "requests";
+    const isAddedMe = tab === "addedme";
+
+    friendsTab.classList.toggle("active", isFriends);
+    requestsTab.classList.toggle("active", isRequests);
+    addedMeTab.classList.toggle("active", isAddedMe);
+
+    friendsListEl.style.display = isFriends ? "" : "none";
+    requestsListEl.style.display = isRequests ? "" : "none";
+    addedMeListEl.style.display = isAddedMe ? "" : "none";
+  }
+
+  friendsTab.addEventListener("click", () => setActiveTab("friends"));
+  requestsTab.addEventListener("click", () => setActiveTab("requests"));
+  addedMeTab.addEventListener("click", () => setActiveTab("addedme"));
+
+  // ====== MES AMIS ======
+  async function loadFriends() {
+    try {
+      friendsListEl.innerHTML = '<p class="menu-preview">Chargement...</p>';
+      const data = await fetchJson("/friends/me");
+
+      friendsCountEl.textContent = Array.isArray(data) ? data.length : 0;
+
+      if (!Array.isArray(data) || data.length === 0) {
+        friendsListEl.innerHTML =
+          "<p class=\"menu-preview\">Tu n'as pas encore d'amis.</p>";
+        return;
+      }
+
+      friendsListEl.innerHTML = data
+        .map((f) => {
+          const u = f.user || {};
+          const name = u.displayName || u.username || u.email || "Étudiant";
+          const dept = u.department || "";
+
+          return `
+            <div class="friend-card">
+              <div class="friend-info">
+                <strong>${escapeHtml(name)}</strong>
+                ${dept ? `<span>${escapeHtml(dept)}</span>` : ""}
+              </div>
+              <button class="btn btn--secondary btn--sm" disabled>Message</button>
+            </div>`;
+        })
+        .join("");
+    } catch (err) {
+      console.warn("Erreur loadFriends:", err);
+      friendsListEl.innerHTML =
+        '<p class="menu-preview">Impossible de charger tes amis.</p>';
+    }
+  }
+
+  // ====== M'ONT AJOUTÉ (demandes reçues) ======
+  async function loadAddedMe() {
+    try {
+      addedMeListEl.innerHTML = '<p class="menu-preview">Chargement...</p>';
+      const data = await fetchJson("/friends/requests");
+
+      addedMeCountEl.textContent = Array.isArray(data) ? data.length : 0;
+
+      if (!Array.isArray(data) || data.length === 0) {
+        addedMeListEl.innerHTML =
+          "<p class=\"menu-preview\">Personne ne t'a encore ajouté.</p>";
+        return;
+      }
+
+      addedMeListEl.innerHTML = data
+        .map((f) => {
+          const u = f.from || {};
+          const name = u.displayName || u.username || u.email || "Étudiant";
+          const dept = u.department || "";
+
+          return `
+            <div class="friend-card" data-friendship-id="${escapeHtml(
+              f.friendshipId
+            )}">
+              <div class="friend-info">
+                <strong>${escapeHtml(name)}</strong>
+                ${dept ? `<span>${escapeHtml(dept)}</span>` : ""}
+              </div>
+              <div class="friend-actions">
+                <button type="button" class="btn btn--primary btn--sm" data-action="accept">Accepter</button>
+                <button type="button" class="btn btn--secondary btn--sm" data-action="reject">Refuser</button>
+              </div>
+            </div>`;
+        })
+        .join("");
+    } catch (err) {
+      console.warn("Erreur loadAddedMe:", err);
+      addedMeListEl.innerHTML =
+        '<p class="menu-preview">Impossible de charger les demandes reçues.</p>';
+    }
+  }
+
+  // clic Accepter / Refuser dans "M'ont ajouté"
+  addedMeListEl.addEventListener("click", async (event) => {
+    const btn = event.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const card = btn.closest(".friend-card");
+    if (!card) return;
+
+    const friendshipId = card.getAttribute("data-friendship-id");
+    if (!friendshipId) return;
+
+    const action = btn.getAttribute("data-action");
+    const path =
+      "/friends/" +
+      encodeURIComponent(friendshipId) +
+      (action === "accept" ? "/accept" : "/reject");
+
+    try {
+      await fetch(API + path + "?_ts=" + Date.now(), {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      await loadFriends();
+      await loadAddedMe();
+    } catch (err) {
+      console.warn("Erreur accept/reject:", err);
+    }
+  });
+
+  // ====== RECHERCHE (avec protection contre les réponses en retard) ======
+  let lastSearchToken = 0;
+
+  async function doSearch() {
+    const q = searchInput.value.trim();
+    if (q.length < 2) {
+      searchResultsEl.innerHTML =
+        '<p class="menu-preview">Tape au moins 2 lettres.</p>';
+      return;
+    }
+
+    const token = ++lastSearchToken;
+    searchResultsEl.innerHTML =
+      '<p class="menu-preview">Recherche en cours...</p>';
+
+    try {
+      const data = await fetchJson(
+        "/friends/search?q=" + encodeURIComponent(q)
+      );
+
+      // Si une autre recherche a été lancée depuis, on ignore ce résultat
+      if (token !== lastSearchToken) {
+        return;
+      }
+
+      if (!Array.isArray(data) || data.length === 0) {
+        searchResultsEl.innerHTML =
+          '<p class="menu-preview">Aucun étudiant trouvé.</p>';
+        return;
+      }
+
+      searchResultsEl.innerHTML = data
+        .map((u) => {
+          const name = u.displayName || u.username || u.email || "Étudiant";
+          let actionHtml = "";
+          let statusHtml = "";
+
+          if (u.friendship) {
+            if (u.friendship.status === "PENDING") {
+              statusHtml =
+                '<span class="friend-status">Demande en attente</span>';
+            } else if (u.friendship.status === "ACCEPTED") {
+              statusHtml = '<span class="friend-status">Déjà ami</span>';
+            }
+          } else {
+            actionHtml =
+              '<button type="button" class="btn btn--primary btn--sm" data-action="add" data-user-id="' +
+              escapeHtml(u.id) +
+              '">Ajouter en ami</button>';
+          }
+
+          return `
+            <div class="friend-card">
+              <div class="friend-info">
+                <strong>${escapeHtml(name)}</strong>
+              </div>
+              <div class="friend-actions">
+                ${actionHtml}
+                ${statusHtml}
+              </div>
+            </div>`;
+        })
+        .join("");
+    } catch (err) {
+      console.warn("Erreur recherche amis:", err);
+      searchResultsEl.innerHTML =
+        '<p class="menu-preview">Erreur pendant la recherche.</p>';
+    }
+  }
+
+  searchBtn.addEventListener("click", doSearch);
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") doSearch();
+  });
+
+  // clic sur "Ajouter en ami" dans les résultats
+  searchResultsEl.addEventListener("click", async (event) => {
+    const btn = event.target.closest("button[data-action='add']");
+    if (!btn) return;
+
+    const userId = btn.getAttribute("data-user-id");
+    if (!userId) return;
+
+    try {
+      await fetch(API + "/friends/request?_ts=" + Date.now(), {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetUserId: userId }),
+      });
+
+      await doSearch();     // met à jour l'état "en attente"
+      await loadAddedMe();  // met à jour l'onglet "M'ont ajouté"
+    } catch (err) {
+      console.warn("Erreur envoi demande ami:", err);
+      alert("Impossible d'envoyer la demande pour le moment.");
+    }
+  });
+
+  // ====== INIT ======
+  setActiveTab("friends");
+  loadFriends();
+  loadAddedMe();
+})();
+</script>
 
 </body>
 </html>
-
-

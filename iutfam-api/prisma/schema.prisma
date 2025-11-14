@@ -28,7 +28,24 @@ model User {
   messages     Message[]
   rideShares   RideShare[]
   classes      UserClass[]
+  friendshipsRequested Friendship[] @relation("friendshipsRequested")
+  friendshipsReceived  Friendship[] @relation("friendshipsReceived")
+
 }
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requester   User             @relation("friendshipsRequested", fields: [requesterId], references: [id])
+  requesterId String
+  addressee   User             @relation("friendshipsReceived", fields: [addresseeId], references: [id])
+  addresseeId String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@unique([requesterId, addresseeId])
+}
+
 
 model ClassGroup {
   id    String      @id @default(cuid())
@@ -186,6 +203,12 @@ enum RSVPStatus {
   PENDING
   ACCEPTED
   DECLINED
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
 
 model CanteenMenu {

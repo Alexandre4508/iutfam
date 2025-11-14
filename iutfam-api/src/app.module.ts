@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { CanteenModule } from './canteen/canteen.module';
 import { EventsModule } from './events/events.module';
 import { EventsController } from './events/events.controller';
+import { FriendsModule } from './friends/friends.module';
 
 
 @Module({
@@ -17,6 +18,7 @@ import { EventsController } from './events/events.controller';
     UsersModule,            
     MessagesModule, CanteenModule,
     EventsModule,
+    FriendsModule,
   ],
   controllers: [AppController,],
   providers: [AppService],

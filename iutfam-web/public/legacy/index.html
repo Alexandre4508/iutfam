@@ -793,19 +793,22 @@
   });
 
 
-  // Historique initial
-  socket.on("chat:history", ({ messages }) => {
-    chatEl.innerHTML = "";
-    (messages || []).forEach(renderMessage);
-    scrollToBottom();
-  });
+// Historique initial (on ne traite que le chat général)
+socket.on("chat:history", ({ chatId, messages }) => {
+  if (chatId !== CHAT_ID) return;
 
+  chatEl.innerHTML = "";
+  (messages || []).forEach(renderMessage);
+  scrollToBottom();
+});
 
-  // Nouveau message en temps réel
-  socket.on("message:new", (m) => {
-    renderMessage(m);
-    scrollToBottom();
-  });
+// Nouveau message en temps réel (chat général uniquement)
+socket.on("message:new", (m) => {
+  if (m.chatId !== CHAT_ID) return;
+
+  renderMessage(m);
+  scrollToBottom();
+});
 
 
 // Indicateur "est en train d’écrire" (utilisateur réel)
@@ -1050,41 +1053,50 @@ socket.on("typing:update", ({ user, typing }) => {
   addedMeTab.addEventListener("click", () => setActiveTab("addedme"));
 
   // ====== MES AMIS ======
-  async function loadFriends() {
-    try {
-      friendsListEl.innerHTML = '<p class="menu-preview">Chargement...</p>';
-      const data = await fetchJson("/friends/me");
+async function loadFriends() {
+  try {
+    friendsListEl.innerHTML = '<p class="menu-preview">Chargement...</p>';
+    const data = await fetchJson("/friends/me");
 
-      friendsCountEl.textContent = Array.isArray(data) ? data.length : 0;
+    friendsCountEl.textContent = Array.isArray(data) ? data.length : 0;
 
-      if (!Array.isArray(data) || data.length === 0) {
-        friendsListEl.innerHTML =
-          "<p class=\"menu-preview\">Tu n'as pas encore d'amis.</p>";
-        return;
-      }
-
-      friendsListEl.innerHTML = data
-        .map((f) => {
-          const u = f.user || {};
-          const name = u.displayName || u.username || u.email || "Étudiant";
-          const dept = u.department || "";
-
-          return `
-            <div class="friend-card">
-              <div class="friend-info">
-                <strong>${escapeHtml(name)}</strong>
-                ${dept ? `<span>${escapeHtml(dept)}</span>` : ""}
-              </div>
-              <button class="btn btn--secondary btn--sm" disabled>Message</button>
-            </div>`;
-        })
-        .join("");
-    } catch (err) {
-      console.warn("Erreur loadFriends:", err);
+    if (!Array.isArray(data) || data.length === 0) {
       friendsListEl.innerHTML =
-        '<p class="menu-preview">Impossible de charger tes amis.</p>';
+        '<p class="menu-preview">Tu n\'as pas encore d\'amis.</p>';
+      return;
     }
+
+    friendsListEl.innerHTML = data
+      .map((f) => {
+        const u = f.user || {};
+        const name = u.displayName || u.username || u.email || "Étudiant";
+        const dept = u.department || "";
+
+        return `
+          <div class="friend-card">
+            <div class="friend-info">
+              <strong>${escapeHtml(name)}</strong>
+              ${dept ? `<span>${escapeHtml(dept)}</span>` : ""}
+            </div>
+            <button
+              type="button"
+              class="btn btn--secondary btn--sm friend-message-btn"
+              data-user-id="${escapeHtml(u.id)}"
+              data-user-name="${escapeHtml(name)}"
+            >
+              Message
+            </button>
+          </div>
+        `;
+      })
+      .join("");
+  } catch (err) {
+    console.warn("Erreur loadFriends:", err);
+    friendsListEl.innerHTML =
+      '<p class="menu-preview">Impossible de charger tes amis.</p>';
   }
+}
+
 
   // ====== M'ONT AJOUTÉ (demandes reçues) ======
   async function loadAddedMe() {
@@ -1257,12 +1269,137 @@ socket.on("typing:update", ({ user, typing }) => {
     }
   });
 
+
+  // ====== CHAT PRIVÉ ENTRE AMIS (via le MODAL #privateChat) ======
+  const privateChatModal   = document.getElementById("privateChat");
+  const privateChatUserEl  = document.getElementById("privateChatUser");
+  const privateMessagesEl  = document.getElementById("privateChatMessages");
+  const privateInputEl     = document.getElementById("privateMessageInput");
+
+  let privateChatId = null;
+
+  // ouvrir un chat privé
+  async function openPrivateChat(friendId, friendName) {
+    try {
+      // 1) Obtenir / créer l'ID de chat privé
+      const res = await fetch(API + "/chats/private", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetUserId: friendId }),
+      });
+
+      if (!res.ok) {
+        console.warn("Erreur /chats/private:", res.status);
+        alert("Impossible d’ouvrir le chat privé.");
+        return;
+      }
+
+      const data = await res.json();
+      privateChatId = data.chatId;
+      if (!privateChatId) {
+        console.warn("Pas de chatId dans la réponse /chats/private", data);
+        return;
+      }
+
+      // 2) Afficher le modal
+      privateChatUserEl.textContent = friendName;
+      privateChatModal.classList.remove("hidden");
+
+      // 3) Rejoindre la room Socket.IO
+      socket.emit("chat:join", { chatId: privateChatId, limit: 50 });
+
+      // 4) Charger l'historique HTTP
+      const histRes = await fetch(
+        API + "/messages?chatId=" + encodeURIComponent(privateChatId) + "&limit=50",
+        { credentials: "include" }
+      );
+
+      let messages = [];
+      if (histRes.ok) {
+        messages = await histRes.json();
+      }
+
+      privateMessagesEl.innerHTML = "";
+      (Array.isArray(messages) ? messages : []).forEach(appendPrivateMessage);
+      privateMessagesEl.scrollTop = privateMessagesEl.scrollHeight;
+    } catch (err) {
+      console.warn("openPrivateChat error:", err);
+      alert("Erreur lors de l’ouverture du chat privé.");
+    }
+  }
+
+  // fermer le modal (bouton ✕)
+  function closePrivateChat() {
+    privateChatModal.classList.add("hidden");
+    privateChatId = null;
+    privateMessagesEl.innerHTML = "";
+    privateInputEl.value = "";
+  }
+  window.closePrivateChat = closePrivateChat; // utilisé dans le HTML
+
+  // envoyer un message (bouton "Envoyer" du modal)
+  async function sendPrivateMessage() {
+    const text = privateInputEl.value.trim();
+    if (!text || !privateChatId) return;
+
+    socket.emit("message:send", {
+      chatId: privateChatId,
+      content: text,
+    });
+
+    privateInputEl.value = "";
+  }
+  window.sendPrivateMessage = sendPrivateMessage; // utilisé dans le HTML
+
+  // afficher un message privé dans le modal
+  function appendPrivateMessage(m) {
+    const author = m.sender || m.author || {};
+    const name =
+      author.displayName || author.username || author.email || "Anonyme";
+
+    const time = m.createdAt
+      ? new Date(m.createdAt).toLocaleTimeString()
+      : "";
+
+    const div = document.createElement("div");
+    div.className = "message";
+    div.innerHTML = `
+      <div class="message-author">${escapeHtml(name)}${time ? " - " + escapeHtml(time) : ""}</div>
+      <div class="message-content">${escapeHtml(m.content)}</div>
+    `;
+    privateMessagesEl.appendChild(div);
+  }
+
+  // réception temps réel des messages privés
+  socket.on("message:new", (msg) => {
+    if (!privateChatId || msg.chatId !== privateChatId) return;
+    appendPrivateMessage(msg);
+    privateMessagesEl.scrollTop = privateMessagesEl.scrollHeight;
+  });
+
+  // clic sur le bouton "Message" dans "Mes amis"
+  document.addEventListener("click", (event) => {
+    const btn = event.target.closest(".friend-message-btn");
+    if (!btn) return;
+
+    const friendId = btn.getAttribute("data-user-id");
+    const friendName = btn.getAttribute("data-user-name");
+
+    if (!friendId) return;
+    openPrivateChat(friendId, friendName || "Étudiant");
+  });
+
+
+
+
   // ====== INIT ======
   setActiveTab("friends");
   loadFriends();
   loadAddedMe();
 })();
 </script>
+
 
 </body>
 </html>

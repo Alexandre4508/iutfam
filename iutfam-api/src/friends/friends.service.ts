@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { FriendshipStatus } from '@prisma/client';
+import { FriendStatus } from '@prisma/client';
 
 
 @Injectable()
@@ -20,9 +20,9 @@ export class FriendsService {
       throw new UnauthorizedException('Missing user id in token');
     }
 
-    const friendships = await this.prisma.friendship.findMany({
+    const friendships = await this.prisma.friendRequest.findMany({
       where: {
-        status: FriendshipStatus.ACCEPTED,
+        status: FriendStatus.ACCEPTED,
         OR: [
           { requesterId: userId },
           { addresseeId: userId },
@@ -54,11 +54,11 @@ export class FriendsService {
       .filter((f) => f.user.id !== userId);
   }
 
-  // Demandes reçues (PENDING où JE suis le destinataire)
+//Demandes reçues (PENDING où JE suis le destinataire)
   async getMyRequests(userId: string) {
-    const reqs = await this.prisma.friendship.findMany({
+    const reqs = await this.prisma.friendRequest.findMany({
       where: {
-        status: FriendshipStatus.PENDING,
+        status: FriendStatus.PENDING,
         addresseeId: userId,
       },
       include: {
@@ -76,8 +76,8 @@ export class FriendsService {
         department: (f.requester as any).department ?? null,
       },
       createdAt: f.createdAt,
-    }));
-  }
+   }));
+}
 
 // Demandes d'amis que J'AI REÇUES (pour "M'ont ajouté")
 async getMyIncomingRequests(userId: string) {
@@ -86,9 +86,9 @@ async getMyIncomingRequests(userId: string) {
     throw new UnauthorizedException('Missing user id in token');
   }
 
-  const reqs = await this.prisma.friendship.findMany({
+  const reqs = await this.prisma.friendRequest.findMany({
     where: {
-      status: FriendshipStatus.PENDING,
+      status: FriendStatus.PENDING,
       addresseeId: userId,      // 👈 JE SUIS LE DESTINATAIRE
     },
     include: {
@@ -133,7 +133,7 @@ async getMyIncomingRequests(userId: string) {
 
     // récupérer les friendships existantes pour savoir si déjà ami / en attente
     const ids = users.map((u) => u.id);
-    const friendships = await this.prisma.friendship.findMany({
+    const friendships = await this.prisma.friendRequest.findMany({
       where: {
         OR: [
           {
@@ -182,7 +182,7 @@ async getMyIncomingRequests(userId: string) {
     }
 
     // vérifier si une relation existe déjà
-    const existing = await this.prisma.friendship.findFirst({
+    const existing = await this.prisma.friendRequest.findFirst({
       where: {
         OR: [
           { requesterId: userId, addresseeId: targetUserId },
@@ -192,15 +192,15 @@ async getMyIncomingRequests(userId: string) {
     });
 
     if (existing) {
-      if (existing.status === FriendshipStatus.PENDING) {
+      if (existing.status === FriendStatus.PENDING) {
         throw new BadRequestException('Une demande est déjà en attente');
       }
-      if (existing.status === FriendshipStatus.ACCEPTED) {
+      if (existing.status === FriendStatus.ACCEPTED) {
         throw new BadRequestException('Vous êtes déjà amis');
       }
     }
 
-    const f = await this.prisma.friendship.create({
+    const f = await this.prisma.friendRequest.create({
       data: {
         requesterId: userId,
         addresseeId: targetUserId,
@@ -212,22 +212,22 @@ async getMyIncomingRequests(userId: string) {
 
   // Accepter une demande
   async accept(userId: string, friendshipId: string) {
-    const f = await this.prisma.friendship.findUnique({ where: { id: friendshipId } });
+    const f = await this.prisma.friendRequest.findUnique({ where: { id: friendshipId } });
     if (!f) throw new NotFoundException('Demande introuvable');
 
     if (f.addresseeId !== userId) {
       throw new ForbiddenException('Tu ne peux accepter que tes propres demandes reçues');
     }
 
-    return this.prisma.friendship.update({
+    return this.prisma.friendRequest.update({
       where: { id: friendshipId },
-      data: { status: FriendshipStatus.ACCEPTED },
+      data: { status: FriendStatus.ACCEPTED },
     });
   }
 
   // Refuser / annuler
   async reject(userId: string, friendshipId: string) {
-    const f = await this.prisma.friendship.findUnique({ where: { id: friendshipId } });
+    const f = await this.prisma.friendRequest.findUnique({ where: { id: friendshipId } });
     if (!f) throw new NotFoundException('Demande introuvable');
 
     if (f.addresseeId !== userId && f.requesterId !== userId) {
@@ -235,9 +235,9 @@ async getMyIncomingRequests(userId: string) {
     }
 
     // soit on supprime, soit on marque REJECTED
-    return this.prisma.friendship.update({
+    return this.prisma.friendRequest.update({
       where: { id: friendshipId },
-      data: { status: FriendshipStatus.REJECTED },
+      data: { status: FriendStatus.REJECTED },
     });
   }
 }

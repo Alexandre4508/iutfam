@@ -16,11 +16,10 @@ export class FriendsService {
   // Liste de mes amis (ACCEPTED)
    async getMyFriends(userId: string) {
     if (!userId) {
-      // si jamais on arrive ici sans userId, on NE VEUT PAS renvoyer tous les amis
       throw new UnauthorizedException('Missing user id in token');
     }
 
-    const friendships = await this.prisma.friendRequest.findMany({
+    const rows = await this.prisma.friendRequest.findMany({
       where: {
         status: FriendStatus.ACCEPTED,
         OR: [
@@ -34,7 +33,7 @@ export class FriendsService {
       },
     });
 
-    return friendships
+    return rows
       .map((f) => {
         const other =
           f.requesterId === userId ? f.addressee : f.requester;

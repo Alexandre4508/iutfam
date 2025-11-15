@@ -19,6 +19,8 @@ export class FriendsController {
     return this.friends.getMyIncomingRequests(userId); // 👈 BIEN CETTE MÉTHODE
   }
 
+
+  
   @Get('search')
   search(@Req() req: any, @Query('q') q: string) {
     const userId = req.user?.sub;

@@ -159,7 +159,6 @@
                 <button type="button" class="nav-link active" data-section="dashboard">🏠 Accueil</button>
                 <button type="button" class="nav-link" data-section="chat">💬 Chat</button>
                 <button type="button" class="nav-link" data-section="friends">👥 Amis</button>
-                <button type="button" class="nav-link" data-section="groups">🏫 Groupes</button>
                 <button type="button" class="nav-link" data-section="events">🎉 Événements</button>
                 <button type="button" class="nav-link" data-section="map">🗺️ Carte</button>
                 <button type="button" class="nav-link" data-section="board">📋 Board</button>
@@ -170,9 +169,9 @@
             <div class="nav-user">
                 <div class="user-info">
                     <span id="currentUserName">Utilisateur</span>
-                    <button type="button" class="btn btn--sm" onclick="showProfilePage()">⚙️ Profil</button>
-                    <button type="button" class="btn btn--sm btn--outline" onclick="logout()">Déconnexion</button>
-                </div>
+                      <a href="/profile" class="btn btn--sm">⚙️ Profil</a>
+    <button type="button" class="btn btn--sm btn--outline" onclick="logout()">Déconnexion</button>
+</div>
             </div>
         </nav>
 
@@ -220,17 +219,7 @@
                         </div>
 
 
-                        <div class="card">
-                            <div class="card__body">
-                                <h3>🍽️ Menu du jour</h3>
-                                <div class="menu-preview">
-                                    <strong>Aujourd'hui :</strong><br>
-                                    Cari poulet, riz, rougail tomate, fruits de saison
-                                </div>
-                                <button type="button" class="btn btn--primary btn--sm" onclick="showSection('canteen')">Voir le menu complet</button>
-                            </div>
-                        </div>
-
+                
 
                         <div class="card">
                             <div class="card__body">
@@ -393,7 +382,6 @@
                         <a class="nav-btn" href="/events">🎉 Événements</a>
 
 
-                        <button type="button" class="btn btn--primary" onclick="showCreateEvent()">+ Créer un événement</button>
                        <a id="create-event" class="btn" href="/events/new">+ Créer un événement</a>
 
 
@@ -1275,10 +1263,6 @@ async function loadFriends() {
     if (!friendId) return;
     openPrivateChat(friendId, friendName || "Étudiant");
   });
-
-  
-
-
 
 
   // ====== INIT ======

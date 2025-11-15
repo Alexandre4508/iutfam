@@ -57,6 +57,7 @@ export class AuthController {
     return { ok: true };
   }
 
+
   @Post('register')
   async register(@Body() dto: RegisterDto) {
     if (!isEmailAllowed(dto.email)) {
@@ -85,7 +86,6 @@ export class AuthController {
       data: { userId: user.id, classGroupId: cls.id },
     });
 
-    // Ajouter le user au chat GENERAL + chat de classe (créés au seed ou à la volée)
     const general = await this.prisma.chat.upsert({
       where: { id: 'GENERAL_SINGLETON' },
       create: { id: 'GENERAL_SINGLETON', type: 'GENERAL' },
@@ -97,7 +97,7 @@ export class AuthController {
       skipDuplicates: true,
     });
 
-    const classChatId = `CLASS_${cls.id}`; // ID unique dérivé de la classe
+    const classChatId = `CLASS_${cls.id}`;
     const classChat = await this.prisma.chat.upsert({
       where: { id: classChatId },
       create: { id: classChatId, type: 'CLASS', classId: cls.id },
@@ -111,3 +111,4 @@ export class AuthController {
     return { ok: true };
   }
 }
+  

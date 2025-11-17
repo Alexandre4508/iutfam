@@ -749,11 +749,14 @@ select.form-control {
 
 /* Landing page styles */
 .landing-header {
-    background: linear-gradient(135deg, var(--color-bg-1), var(--color-bg-8));
+    /* plus de fond opaque ici */
+    background: transparent;
     min-height: 100vh;
     display: flex;
     align-items: center;
     text-align: center;
+    position: relative;
+    z-index: 1; /* au-dessus de la vidéo */
 }
 
 .logo-main {
@@ -1752,6 +1755,420 @@ select.form-control {
     }
 }
 
+/* === Profil nouvelle carte (Next.js) === */
+
+.profile-page {
+    min-height: 100vh;
+    background: var(--color-background);
+    padding: var(--space-32) var(--space-16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-card {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-card-border);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+/* Bandeau en haut, proche des cartes d’évènements */
+.profile-card-header {
+    background: linear-gradient(
+        135deg,
+        var(--color-bg-5),
+        rgba(0, 0, 0, 0.2)
+    );
+    padding: var(--space-16) var(--space-24);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profile-card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+}
+
+.profile-card-icon {
+    font-size: 1.4em;
+}
+
+/* Corps de la carte */
+.profile-card-body {
+    padding: var(--space-24) var(--space-24) var(--space-20);
+}
+
+.profile-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-16);
+    flex-wrap: wrap;
+}
+
+.profile-main-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+}
+
+.profile-main-name {
+    margin: 0 0 var(--space-4);
+}
+
+.profile-main-sub {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.profile-main-right {
+    text-align: right;
+}
+
+.profile-stat-label {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+}
+
+.profile-stat-value {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.profile-separator {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: var(--space-20) 0;
+}
+
+/* Sections infos */
+.profile-sections {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--space-24);
+}
+
+.profile-section h3 {
+    margin-bottom: var(--space-8);
+}
+
+/* Bas de carte, style footer d’évènement */
+.profile-card-footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-16) var(--space-24);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-8);
+    background: var(--color-charcoal-900, transparent);
+}
+
+.profile-btn-danger {
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-card {
+        margin: 0 var(--space-8);
+    }
+    .profile-sections {
+        grid-template-columns: 1fr;
+    }
+    .profile-main-right {
+        text-align: left;
+    }
+}
+/* Par défaut, on cache la vidéo */
+#bgVideo {
+  display: none;
+}
+
+/* La vidéo n’est visible que quand le body a la classe has-video */
+body.has-video #bgVideo {
+  display: block;
+}
+
+
+/* Voile très léger au-dessus de la vidéo */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.25);  /* plus de cercles, juste un léger fondu */
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Le header au-dessus de tout ça */
+.landing-header {
+  background: transparent !important;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 5; /* au-dessus de la vidéo */
+}
+
+.text-bg {
+  background: rgba(0, 0, 0, 0.45);   /* fond sombre transparent */
+  padding: 8px 16px;
+  border-radius: 12px;
+  display: inline-block;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+
+.glass-card {
+  background: rgba(0, 0, 0, 0.55);   /* fond sombre */
+  padding: 25px;
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* Petit effet hover pour style premium */
+.glass-card:hover {
+  background: rgba(0, 0, 0, 0.65);
+  transform: translateY(-3px);
+}
+
+
+/* === Auth: effet "bulle glass" comme l'accueil === */
+
+/* On laisse voir la vidéo derrière */
+.auth-container {
+  background: transparent;
+}
+
+/* Légère vignette sombre pour détacher la carte du fond */
+body.has-video .auth-container {
+  background: radial-gradient(
+    circle at top,
+    rgba(0, 0, 0, 0.25),
+    rgba(0, 0, 0, 0.85)
+  );
+}
+
+/* Carte login / register en mode glass */
+.auth-card {
+  background: rgba(0, 0, 0, 0.80);           /* sombre mais pas opaque */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+  max-width: 480px;                           /* largeur confortable */
+}
+
+/* Texte bien lisible dans la carte */
+.auth-card h2,
+.auth-card p,
+.auth-card label {
+  color: #f9fafb;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Inputs bien détachés du fond */
+.auth-card .form-control {
+  background: rgba(243, 244, 246, 0.96);
+  border-color: rgba(15, 23, 42, 0.5);
+}
+
+/* Petit bonus: bouton qui prend toute la largeur dans la carte */
+.auth-card .btn--primary.btn--full-width,
+.auth-card button[type="submit"] {
+  width: 100%;
+}
+
+/* Fond général de l'app (après connexion) */
+.app.active .main-content {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left,
+      rgba(var(--color-teal-500-rgb, 33,128,141), 0.18),
+      transparent 55%)
+    ,
+    radial-gradient(circle at bottom right,
+      rgba(var(--color-orange-400-rgb, 230,129,97), 0.10),
+      transparent 60%)
+    ,
+    var(--color-background);
+}
+
+/* Cartes uniquement sur le dashboard */
+#dashboard .card {
+  background:
+    radial-gradient(circle at top left,
+      rgba(var(--color-teal-500-rgb, 33,128,141), 0.12),
+      transparent 55%)
+    ,
+    var(--color-surface);
+  border-radius: 18px;
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+  transition: transform 0.18s var(--ease-standard),
+              box-shadow 0.18s var(--ease-standard),
+              border-color 0.18s var(--ease-standard);
+}
+
+#dashboard .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+  border-color: rgba(var(--color-teal-500-rgb, 33,128,141), 0.35);
+}
+
+/* Titre + phrase d’accueil plus travaillés */
+#dashboard h1 {
+  font-size: 34px;
+  margin-bottom: 6px;
+}
+
+#dashboard .welcome-message {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin-bottom: 32px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* petit point vert "en ligne" pour le côté accueillant */
+#dashboard .welcome-message::before {
+  content: "●";
+  font-size: 10px;
+  color: #22c55e;
+}
+
+
 /* une seule section visible à la fois */
 #main-app .section { display: none; }
 #main-app .section.active { display: block; }
+
+/* NAVBAR plus présente et lisible dans l'app */
+.app .navbar {
+  padding: 12px 24px;
+  background: rgba(3, 7, 18, 0.94); /* quasi noir mais propre */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Logo + texte IUTFAM plus affirmés */
+.app .nav-brand span {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+/* Menu mieux espacé */
+.app .nav-menu {
+  gap: 12px;
+}
+
+/* Boutons d’onglets = petits “pills” plus visibles */
+.app .nav-link {
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-secondary);
+  transition: background 0.18s var(--ease-standard),
+              color 0.18s var(--ease-standard),
+              transform 0.15s var(--ease-standard),
+              box-shadow 0.15s var(--ease-standard),
+              border-color 0.15s var(--ease-standard);
+}
+
+.app .nav-link:hover {
+  background: rgba(15, 23, 42, 0.9);
+  border-color: rgba(148, 163, 184, 0.45);
+  color: var(--color-text);
+}
+
+/* Onglet actif bien mis en avant */
+.app .nav-link.active {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-teal-500-rgb, 33,128,141), 1),
+    rgba(56, 189, 248, 0.95)
+  );
+  color: var(--color-btn-primary-text);
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 1),
+    0 10px 22px rgba(0, 0, 0, 0.75);
+  transform: translateY(-1px);
+}
+
+/* Partie utilisateur un peu plus “chip” */
+.app .nav-user span {
+  font-weight: 500;
+}
+
+.app .nav-user .btn.btn--sm {
+  border-radius: 999px;
+}
+
+
+/* Fond global de l'app après connexion */
+.app.active .main-content {
+  background: var(--color-background);
+}
+
+
+
+/* Cartes du dashboard plus accueillantes */
+#dashboard .card {
+  background:
+    radial-gradient(circle at top left,
+      rgba(var(--color-teal-500-rgb, 33,128,141), 0.12),
+      transparent 55%)
+    ,
+    var(--color-surface);
+  border-radius: 18px;
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  transition: transform 0.18s var(--ease-standard),
+              box-shadow 0.18s var(--ease-standard),
+              border-color 0.18s var(--ease-standard);
+}
+
+#dashboard .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  border-color: rgba(var(--color-teal-500-rgb, 33,128,141), 0.4);
+}
+
+

@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { BackToIutfamButton } from "./BackToIutfamButton";
-
 
 type EventDetail = {
   id: string;
@@ -52,20 +50,32 @@ export const dynamic = "force-dynamic";
 export default async function EventDetailPage(props: {
   params: Promise<{ id: string }>;
 }) {
-  // ⚠️ avec Next 15, params est une Promise → on attend
+  // ⚠️ Next 15 → params est une Promise
   const { id } = await props.params;
 
-  // ⚠ côté serveur → URL interne Docker
   const base = process.env.API_INTERNAL_URL || "http://api:4000";
   const res = await fetch(`${base}/events/${id}`, { cache: "no-store" });
 
   if (!res.ok) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <p className="text-red-600">Événement introuvable.</p>
-        <Link href="/events" className="underline">
-          ← Retour
-        </Link>
+      <div className="min-h-screen bg-[#05060b] text-white flex items-center justify-center px-4">
+        <div className="w-full max-w-xl space-y-4">
+          <Link
+            href="/legacy/index.html#events"
+            className="inline-flex items-center text-sm text-teal-300 hover:text-teal-200"
+          >
+            ← Retour au site IUTFAM
+          </Link>
+
+          <div className="rounded-3xl border border-red-500/50 bg-red-500/10 px-6 py-4 text-sm">
+            <p className="font-semibold text-red-200 mb-1">
+              Événement introuvable
+            </p>
+            <p className="text-red-100/80">
+              L’événement demandé n’existe plus ou vous n’y avez pas accès.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -74,35 +84,78 @@ export default async function EventDetailPage(props: {
   const organiserLabel = buildOrganiser(ev);
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-4">
-    <Link href="http://localhost:3000/legacy/index.html#events" className="underline">
-  ← Retour au site IUTFAM
-</Link>
-
-
-      <h1 className="text-2xl font-semibold">{ev.title}</h1>
-
-      <div className="text-gray-600">
-        {ev.location ? ev.location + " • " : ""}
-        {fmt(ev.startsAt)}
-        {ev.endsAt ? " → " + fmt(ev.endsAt) : ""}
-      </div>
-
-      {ev.description && (
-        <p className="whitespace-pre-wrap">{ev.description}</p>
-      )}
-
-      <div className="text-sm text-gray-500">
-        Organisé par {organiserLabel}
-      </div>
-
-      <div className="flex gap-2 pt-2">
-        <button
-          className="px-3 py-1 rounded-lg border text-gray-400 cursor-not-allowed"
-          disabled
+    <div className="min-h-screen bg-[#05060b] text-white flex justify-center px-4 py-10">
+      <div className="w-full max-w-4xl space-y-4">
+        {/* Lien retour vers TON site */}
+        <Link
+          href="/legacy/index.html#events"
+          className="inline-flex items-center text-sm text-teal-300 hover:text-teal-200"
         >
-          Participer (désactivé)
-        </button>
+          ← Retour au site IUTFAM
+        </Link>
+
+        {/* Carte détaillée de l’événement */}
+        <div className="rounded-3xl border border-purple-900/60 bg-[#090918] shadow-2xl overflow-hidden">
+          {/* Bandeau haut style cartes événements */}
+          <div className="bg-[#30124d] px-6 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-fuchsia-300/80 mb-1">
+                🎉 Événement
+              </p>
+              <h1 className="text-2xl font-semibold tracking-tight">
+                {ev.title}
+              </h1>
+            </div>
+            <div className="text-right text-sm text-slate-200">
+              <div>{fmt(ev.startsAt)}</div>
+              {ev.endsAt && (
+                <div className="text-xs text-slate-400">
+                  jusqu&apos;à {fmt(ev.endsAt)}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Contenu */}
+          <div className="px-6 py-5 space-y-4">
+            {/* Lieu + horaires synthèse */}
+            <div className="text-sm text-slate-300 space-y-1">
+              {ev.location && (
+                <p className="flex items-center gap-2">
+                  <span className="text-pink-400">📍</span>
+                  <span>{ev.location}</span>
+                </p>
+              )}
+            </div>
+
+            {/* Description */}
+            {ev.description && (
+              <div className="rounded-2xl border border-slate-800 bg-black/20 px-4 py-3">
+                <p className="text-sm whitespace-pre-wrap text-slate-100">
+                  {ev.description}
+                </p>
+              </div>
+            )}
+
+            {/* Organisateur */}
+            <div className="text-xs text-slate-400">
+              Organisé par{" "}
+              <span className="text-slate-100 font-medium">
+                {organiserLabel}
+              </span>
+            </div>
+
+            {/* Boutons */}
+            <div className="flex justify-end pt-4">
+              <button
+                disabled
+                className="rounded-xl border border-slate-600 bg-transparent px-5 py-2 text-sm text-slate-300 cursor-not-allowed"
+              >
+                Participer (désactivé)
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

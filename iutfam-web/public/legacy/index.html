@@ -6,21 +6,44 @@
     <title>IUTFAM - Plateforme Étudiante IUT Réunion</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="has-video">
+
+<!-- UNIQUEMENT sur la page d'accueil -->
+<video
+  autoplay
+  muted
+  loop
+  playsinline
+  id="bgVideo"
+  style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+  "
+>
+  <source src="assets/videos/IUT-TERRE-SAINTE-aceuille-video.mp4" type="video/mp4" />
+</video>
+
+
     <!-- Page d'accueil -->
     <div id="landing-page" class="page active">
         <header class="landing-header">
             <div class="container">
-                <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/3d7c6c29-ee4d-4964-81b0-f4659319b685.png" alt="IUTFAM Logo" class="logo-main">
+                <img src="assets/photo/logo-iutfam.png" alt="IUTFAM Logo" class="logo-main">
                 <h1>Bienvenue sur IUTFAM</h1>
-                <p class="welcome-text">La plateforme qui connecte tous les étudiants de l'IUT de la Réunion ! 🌺</p>
-               
+              <p class="text-bg">
+              La plateforme qui connecte tous les étudiants de l'IUT de la Réunion ! 🌸
+              </p>               
                 <div class="welcome-features">
-                    <div class="feature-card">
+                    <div class="feature-card  glass-card">
                         <h3>🗣️ Chat & Communauté</h3>
                         <p>Échange avec tes camarades dans le chat général ou en privé</p>
                     </div>
-                    <div class="feature-card">
+                    <div class="feature-card  glass-card">
                         <h3>🎉 Événements</h3>
                         <p>Organise et participe aux sorties étudiantes</p>
                     </div>
@@ -46,7 +69,7 @@
     <div id="register-page" class="page">
         <div class="auth-container">
             <div class="auth-card">
-                <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/3d7c6c29-ee4d-4964-81b0-f4659319b685.png" alt="IUTFAM Logo" class="logo-auth">
+                                <img src="assets/photo/logo-iutfam.png" alt="IUTFAM Logo" class="logo-auth">
                 <h2>Créer un compte IUTFAM</h2>
                 <form id="register-form" onsubmit="return register(event)">
                     <div class="form-group">
@@ -105,7 +128,7 @@
     <div id="login-page" class="page">
       <div class="auth-container">
         <div class="auth-card">
-          <img src="/legacy/logo-iutfam.jpeg" alt="IUTFAM" style="max-width:160px; height:auto;" />
+          <img src="assets/photo/logo-iutfam.png" alt="IUTFAM" style="max-width:160px; height:auto;" />
           <h2>Se connecter à IUTFAM</h2>
 
 
@@ -152,7 +175,7 @@
         <!-- Navigation -->
         <nav class="navbar">
             <div class="nav-brand">
-                <img src="https://user-gen-media-assets.s3.amazonaws.com/gpt4o_images/3d7c6c29-ee4d-4964-81b0-f4659319b685.png" alt="IUTFAM" class="logo-nav">
+              <img src="assets/photo/logo-iutfam.png" alt="IUTFAM Logo" alt="IUTFAM" class="logo-nav">
                 <span>IUTFAM</span>
             </div>
             <div class="nav-menu">
@@ -160,11 +183,7 @@
                 <button type="button" class="nav-link" data-section="chat">💬 Chat</button>
                 <button type="button" class="nav-link" data-section="friends">👥 Amis</button>
                 <button type="button" class="nav-link" data-section="events">🎉 Événements</button>
-                <button type="button" class="nav-link" data-section="map">🗺️ Carte</button>
-                <button type="button" class="nav-link" data-section="board">📋 Board</button>
-                <button type="button" class="nav-link" data-section="canteen">🍽️ Cantine</button>
-                <button type="button" class="nav-link" data-section="lostfound">🔍 Lost & Found</button>
-                <button type="button" class="nav-link" data-section="transport">🚗 Transport</button>
+           
             </div>
             <div class="nav-user">
                 <div class="user-info">
@@ -187,7 +206,7 @@
                     <div class="dashboard-grid">
                         <div class="card">
                             <div class="card__body">
-                                <h3>💬 Derniers messages </h3>
+                                <h3>💬 Derniers messages (illustration) </h3>
                                 <div id="recentMessages" class="recent-messages">
                                     <div class="message-preview">
                                         <strong>Marie (GEA):</strong> Quelqu'un pour la cantine ce midi ?
@@ -203,7 +222,7 @@
 
                         <div class="card">
                             <div class="card__body">
-                                <h3>🎉 Prochains événements</h3>
+                                <h3>🎉 Prochains événements (illustration)</h3>
                                 <div class="upcoming-events">
                                     <div class="event-preview">
                                         <strong>Repas cantine ensemble</strong><br>
@@ -223,7 +242,7 @@
 
                         <div class="card">
                             <div class="card__body">
-                                <h3>👥 Activité</h3>
+                                <h3>👥 Activité (illustration) </h3>
                                 <div class="activity-stats">
                                     <p><strong>127</strong> étudiants connectés</p>
                                     <p><strong>5</strong> nouveaux événements</p>
@@ -342,7 +361,7 @@
             <!-- Groupes de classe -->
             <section id="groups" class="section">
                 <div class="container">
-                    <h1>🏫 Groupes de classe</h1>
+                    <h1>🏫 Groupes de classe (illustration)</h1>
                     <div class="groups-content">
                         <div class="group-card">
                             <div class="group-header">
@@ -377,7 +396,7 @@
             <!-- Événements -->
             <section id="events" class="section">
                 <div class="container">
-                    <h1>🎉 Événements</h1>
+                    <h1>🎉 Événements </h1>
                     <div class="events-header">                        
                         <a class="nav-btn" href="/events">🎉 Événements</a>
 
@@ -1272,6 +1291,5 @@ async function loadFriends() {
 })();
 </script>
 
-
-</body>
+</body class="has-video">
 </html>

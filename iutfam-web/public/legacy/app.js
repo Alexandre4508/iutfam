@@ -169,9 +169,13 @@ localStorage.setItem('iutfam_logged_in', '1');
       if (el) el.style.display = "none";
     });
 
-    // 2) montrer l'application principale
+        // 2) montrer l'application principale
     const app = document.getElementById('main-app');
     if (app) app.style.display = 'block';
+
+    // 🔻 on enlève la vidéo de fond une fois connecté
+    document.body.classList.remove('has-video');
+
 
     // 3) n'afficher que la section dashboard au départ
     const sections = document.querySelectorAll('#main-app .section');
@@ -212,6 +216,8 @@ function showLandingPage() {
   // montre la landing
   const landing = document.getElementById('landing-page');
   if (landing) landing.style.display = 'block';
+    // 🔺 remettre la vidéo en fond sur l'accueil
+  document.body.classList.add('has-video');
 }
 
 //fonction de navigation
@@ -285,6 +291,9 @@ function logout() {
 
   wireNav();
   showLoginPage();
+
+    // (optionnel) si tu veux la vidéo visible sur l'écran de login
+  document.body.classList.add('has-video');
 }
 
 
@@ -295,6 +304,9 @@ function backToApp() {
   // afficher l'application principale
   const app = document.getElementById('main-app');
   if (app) app.style.display = 'block';
+
+    // 🔻 plus de vidéo dans l'app
+  document.body.classList.remove('has-video');
 
   // par défaut, on montre le dashboard
   document.querySelectorAll('#main-app .section').forEach(sec => {
@@ -312,28 +324,66 @@ function backToApp() {
 // rendre accessible depuis le HTML (onclick="backToApp()")
 window.backToApp = backToApp;
 
-
-
-
 // ============================================
 // Initialisation
 // ============================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Est-ce qu'on a déjà une session "legacy" ouverte ?
   const loggedFlag = localStorage.getItem('iutfam_logged_in') === '1';
 
   if (loggedFlag) {
-    // On affiche directement l'application
-    backToApp();
+    try {
+      // On vérifie auprès du backend qui est connecté
+      const res = await fetch(`${API_URL}/users/me`, {
+        credentials: 'include',
+      });
 
-    // Si l'URL contient #events, on va directement sur l'onglet événements
-    const hash = window.location.hash.replace('#', '');
-    if (hash === 'events') {
-      showSection('events');
+      if (!res.ok) {
+        throw new Error('Non authentifié');
+      }
+
+      const me = await res.json();
+      currentUser = me;
+
+      // Nom à afficher
+      const displayName =
+        me.displayName ||
+        (me.firstName || me.lastName ? `${me.firstName || ''} ${me.lastName || ''}`.trim() : '') ||
+        me.username ||
+        me.email ||
+        'Utilisateur';
+
+      // Mise à jour des zones de texte
+      const u1 = document.getElementById('currentUserName');
+      if (u1) u1.textContent = displayName;
+      const u2 = document.getElementById('dashboardUserName');
+      if (u2) u2.textContent = displayName;
+
+      // Afficher directement l'application
+      backToApp();
+      document.body.classList.remove('has-video');
+
+      // Si l'URL contient #events, on va directement sur l'onglet événements
+      const hash = window.location.hash.replace('#', '');
+      if (hash === 'events') {
+        showSection('events');
+      }
+    } catch (err) {
+      console.warn('[init] session invalide, retour login:', err);
+
+      // Session plus valide → on nettoie et on renvoie au login
+      localStorage.removeItem('iutfam_logged_in');
+      localStorage.removeItem('jwt');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('token');
+
+      showLoginPage();
+      document.body.classList.add('has-video');
     }
   } else {
-    // Pas connecté → page de login
-    showLoginPage();
+    // Pas connecté → page d'accueil publique
+    showLandingPage();
+    document.body.classList.add('has-video');
   }
 
   // ✅ branche les formulaires
@@ -345,4 +395,3 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById('login-form')
     ?.addEventListener('submit', (e) => login(e));
 });
-
